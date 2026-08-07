@@ -501,19 +501,19 @@ AGE_GROUPS = {
 
 
 # ==========================================
-# 4. ALL CONTROL SLIDERS CONSOLIDATED IN SIDEBAR
+# 4. ALL CONTROL CONTROLS CONSOLIDATED IN SIDEBAR
 # ==========================================
 st.sidebar.title("⚙️ Personalization Hub")
 st.sidebar.markdown("### 🎛️ Configure Your Profile")
 
 exam_list = list(EXAMS_DATA.keys())
 
-# 1. Target Exam Selection Slider
+# 1. Standard Custom Exam Selection Dropdown
 st.sidebar.markdown("**1. Select Target Exam:**")
-selected_exam_name = st.sidebar.select_slider(
-    "Target Exam Slider",
+selected_exam_name = st.sidebar.selectbox(
+    "Select Target Exam",
     options=exam_list,
-    value=exam_list[0],
+    index=0,
     format_func=lambda x: f"{EXAMS_DATA[x]['icon']} {x}",
     label_visibility="collapsed"
 )
