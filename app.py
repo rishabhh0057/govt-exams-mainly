@@ -142,7 +142,7 @@ def create_pptx_plan(exam_name, daily_hours, prep_months, plan_text):
 
 
 # ==========================================
-# 3. EXAMS DATA (EXPANDED SSC COLLECTION)
+# 3. EXAMS DATA COLLECTION
 # ==========================================
 EXAMS_DATA = {
     "SSC CGL": {
@@ -413,19 +413,18 @@ EXAMS_DATA = {
 
 
 # ==========================================
-# 4. SIDEBAR - EXAM SLIDER SELECTOR
+# 4. SIDEBAR - MAIN NAVIGATION
 # ==========================================
 st.sidebar.title("🎓 Navigation & Selection")
-st.sidebar.markdown("### 🎛️ Select Your Targeted Exam")
+st.sidebar.markdown("### 🎛️ Browse Exam Hub")
 
 exam_list = list(EXAMS_DATA.keys())
 
-# Sidebar select slider featuring all SSC exams
-selected_exam_name = st.sidebar.select_slider(
-    "Slide to select exam:",
+# Main Sidebar Exam Selector
+selected_exam_name = st.sidebar.selectbox(
+    "Select Exam to Explore Resources:",
     options=exam_list,
-    value=exam_list[0],
-    format_func=lambda exam: f"{EXAMS_DATA[exam]['icon']} {exam}"
+    index=0
 )
 
 exam_info = EXAMS_DATA[selected_exam_name]
@@ -506,9 +505,28 @@ with tab_quiz:
             score = sum([1 for i, q in enumerate(quiz_questions) if user_answers.get(i) == q["answer"]])
             st.success(f"🎯 Your Score: {score} / {len(quiz_questions)}")
 
-# TAB 5: AI CUSTOM GOAL PLANNER & EXPORTS
+# TAB 5: AI CUSTOM GOAL PLANNER WITH EXAM SLIDER/SELECTOR
 with tab_custom:
-    st.subheader(f"🤖 Generate & Export Customized Goal Plan for {selected_exam_name}")
+    st.subheader("🤖 Generate & Export Customized Goal Plan")
+    st.markdown("Configure your specific targeted exam and daily routine to generate a downloadable plan.")
+
+    # Slider / Select control to pick targeted exam directly inside Custom Planner
+    custom_exam_options = exam_list + ["Custom / Other Exam"]
+    
+    targeted_exam = st.select_slider(
+        "🎯 Slide to select your targeted exam for the Goal Plan:",
+        options=custom_exam_options,
+        value=selected_exam_name,
+        format_func=lambda x: f"🎓 {x}"
+    )
+
+    # Optional custom exam input if 'Custom / Other Exam' is selected
+    if targeted_exam == "Custom / Other Exam":
+        final_exam_title = st.text_input("Enter your Custom Exam Name:", value="Competitive Exam Target")
+    else:
+        final_exam_title = targeted_exam
+
+    st.markdown("---")
     
     col_a, col_b = st.columns(2)
     daily_hours = col_a.slider("Daily study capacity (Hours):", 2, 14, 6)
@@ -517,18 +535,18 @@ with tab_custom:
 
     if st.button("🚀 Generate Goal Plan"):
         if not api_key:
-            plan_content = f"""Target Exam: {selected_exam_name} ({exam_info['full_name']})
+            plan_content = f"""Target Exam: {final_exam_title}
 Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
 
-• Slot 1 ({int(daily_hours * 0.4)} hrs): Core Subject / Primary Technical / Advance Concepts.
-• Slot 2 ({int(daily_hours * 0.3)} hrs): Secondary Subject & PYQ Practice Drills.
-• Slot 3 ({int(daily_hours * 0.2)} hrs): Speed Mock Tests & Error Analysis.
-• Slot 4 ({round(daily_hours * 0.1, 1)} hrs): Daily General Awareness / Current Affairs & Formula Review."""
+• Slot 1 ({int(daily_hours * 0.4)} hrs): Core Technical / High Priority Subject (Fresh mind session).
+• Slot 2 ({int(daily_hours * 0.3)} hrs): Secondary Subject & Problem Sets / PYQs.
+• Slot 3 ({int(daily_hours * 0.2)} hrs): Speed Tests, Mocks & Error Analysis.
+• Slot 4 ({round(daily_hours * 0.1, 1)} hrs): Daily Current Affairs & Formulas Review before sleep."""
         else:
             try:
                 from groq import Groq
                 client = Groq(api_key=api_key)
-                prompt = f"Create a structured daily study plan for {selected_exam_name} ({exam_info['full_name']}) with {daily_hours} hours available daily and {prep_months} months remaining."
+                prompt = f"Create a structured daily study plan for {final_exam_title} with {daily_hours} hours available daily and {prep_months} months remaining."
                 response = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[{"role": "user", "content": prompt}]
@@ -539,14 +557,14 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
                 plan_content = "Default Goal Plan Generated."
 
         st.session_state['generated_plan'] = plan_content
-        st.session_state['plan_exam'] = selected_exam_name
+        st.session_state['plan_exam'] = final_exam_title
         st.session_state['plan_hours'] = daily_hours
         st.session_state['plan_months'] = prep_months
 
     # Display generated plan and export/share tools if present
     if 'generated_plan' in st.session_state:
         st.markdown("---")
-        st.markdown("### 📋 Generated Study Plan")
+        st.markdown(f"### 📋 Generated Study Plan for {st.session_state['plan_exam']}")
         st.text_area("Your Custom Plan", st.session_state['generated_plan'], height=200)
 
         st.markdown("### 📥 Download Plan File")
