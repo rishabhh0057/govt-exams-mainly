@@ -1,4 +1,5 @@
 import io
+import time
 import urllib.parse
 import streamlit as st
 from docx import Document
@@ -135,13 +136,13 @@ def create_docx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     doc.add_heading(f"Customized Goal Plan: {exam_name}", level=0)
     
     p = doc.add_paragraph()
-    p.add_run(f"Target Exam: ").bold = True
+    p.add_run("Target Exam: ").bold = True
     p.add_run(f"{exam_name}\n")
-    p.add_run(f"Aspirant Profile / Age Group: ").bold = True
+    p.add_run("Aspirant Profile / Age Group: ").bold = True
     p.add_run(f"{age_group}\n")
-    p.add_run(f"Timeline: ").bold = True
+    p.add_run("Timeline: ").bold = True
     p.add_run(f"{prep_months} Months\n")
-    p.add_run(f"Daily Capacity: ").bold = True
+    p.add_run("Daily Capacity: ").bold = True
     p.add_run(f"{daily_hours} Hours/day")
 
     doc.add_heading("Detailed Strategy & Timetable", level=1)
@@ -190,7 +191,7 @@ def create_pptx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
 
 
 # ==========================================
-# 3. EXPANDED EXAM DATABASE
+# 3. EXPANDED EXAM & MOCK PRACTICE DATABASE
 # ==========================================
 EXAMS_DATA = {
     "SSC CGL": {
@@ -208,20 +209,43 @@ EXAMS_DATA = {
             {"subject": "Quantitative Aptitude (Maths)", "teacher": "Gagan Pratap Sir", "channel": "Gagan Pratap Maths", "video_title": "Complete Maths Marathon", "youtube_link": "https://www.youtube.com/results?search_query=ssc+cgl+maths+gagan+pratap+marathon"},
             {"subject": "Maths Practice Drills", "teacher": "Aditya Ranjan Sir", "channel": "Rankers Gurukul", "video_title": "CGL Practice Series", "youtube_link": "https://www.youtube.com/results?search_query=aditya+ranjan+sir+cgl+maths"},
             {"subject": "English Language", "teacher": "Nimisha Bansal Ma'am", "channel": "Nimisha Bansal", "video_title": "120 Rules of Grammar Complete", "youtube_link": "https://www.youtube.com/results?search_query=120+rules+of+grammar+nimisha+bansal"},
-            {"subject": "English Vocabulary", "teacher": "Rani Ma'am", "channel": "English With Rani Ma'am", "video_title": "Vocab Root Words Series", "youtube_link": "https://www.youtube.com/results?search_query=rani+mam+vocab+marathon"},
             {"subject": "General Studies & Static GK", "teacher": "Parmar SSC", "channel": "Parmar SSC", "video_title": "Complete Static GK Batch", "youtube_link": "https://www.youtube.com/results?search_query=parmar+ssc+gk"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC CGL Tier-1 All 39 Shifts Question Papers", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"},
-            {"year": "2023", "title": "SSC CGL Tier-2 (Mains) Official Question Paper", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"},
-            {"year": "2022", "title": "SSC CGL Tier-1 Previous Year Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF Download"}
+            {"year": "2024", "title": "SSC CGL Tier-1 All Shifts Question Papers", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"},
+            {"year": "2023", "title": "SSC CGL Tier-2 (Mains) Official Question Paper", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"}
         ],
         "mocks": [
-            {"title": "CGL Full Length Tier-1 Mock 01", "questions": 100, "time": "60 Mins", "level": "Moderate"},
-            {"title": "CGL Tier-2 Quantitative Aptitude Speed Test", "questions": 30, "time": "35 Mins", "level": "Hard"}
-        ],
-        "quiz": [
-            {"question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?", "options": ["Article 352", "Article 356", "Article 360", "Article 370"], "answer": "Article 352", "explanation": "Article 352 deals with National Emergency."}
+            {
+                "id": "cgl_m1",
+                "title": "SSC CGL Full Practice Set - 01",
+                "questions": [
+                    {
+                        "question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?",
+                        "options": ["Article 352", "Article 356", "Article 360", "Article 370"],
+                        "answer": "Article 352",
+                        "explanation": "Article 352 deals with National Emergency due to war, external aggression, or armed rebellion."
+                    },
+                    {
+                        "question": "If the length of a rectangle is increased by 20% and breadth is decreased by 10%, what is the net change in area?",
+                        "options": ["8% increase", "10% increase", "5% decrease", "12% increase"],
+                        "answer": "8% increase",
+                        "explanation": "Net change = +20 - 10 + ((20 * -10)/100) = 10 - 2 = +8% increase."
+                    },
+                    {
+                        "question": "Find the correctly spelt word:",
+                        "options": ["Accomodation", "Accommodation", "Acommodation", "Accommodatoin"],
+                        "answer": "Accommodation",
+                        "explanation": "The correct spelling is 'Accommodation' with double 'c' and double 'm'."
+                    },
+                    {
+                        "question": "Select the option that is related to the third word in the same way: Book : Publisher :: Film : ?",
+                        "options": ["Director", "Producer", "Actor", "Writer"],
+                        "answer": "Producer",
+                        "explanation": "A publisher finances/produces a book, similarly a producer finances/produces a film."
+                    }
+                ]
+            }
         ]
     },
     "SSC CHSL": {
@@ -236,18 +260,30 @@ EXAMS_DATA = {
             "**Phase 3: Mocks & Typing Speed (Month 5):** Conduct full-length tests and daily typing practice."
         ],
         "top_teachers": [
-            {"subject": "Reasoning Ability", "teacher": "Vikramjeet Sir", "channel": "Rankers Gurukul", "video_title": "SSC CHSL Reasoning Complete Playlist", "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+vikramjeet+sir"},
-            {"subject": "Arithmetic Maths", "teacher": "Aditya Ranjan Sir", "channel": "Rankers Gurukul", "video_title": "CHSL Maths Foundation", "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+maths+aditya+ranjan"}
+            {"subject": "Reasoning Ability", "teacher": "Vikramjeet Sir", "channel": "Rankers Gurukul", "video_title": "SSC CHSL Reasoning Complete Playlist", "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+vikramjeet+sir"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC CHSL Tier-1 Shifts Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF"},
-            {"year": "2023", "title": "SSC CHSL Tier-2 Paper Collection", "link": "https://ssc.gov.in/", "format": "PDF"}
+            {"year": "2024", "title": "SSC CHSL Tier-1 Shifts Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
         "mocks": [
-            {"title": "CHSL Speed Booster Mock Test", "questions": 100, "time": "60 Mins", "level": "Easy-Moderate"}
-        ],
-        "quiz": [
-            {"question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?", "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"], "answer": "Daman", "explanation": "Daman was declared the capital of the merged UT in 2020."}
+            {
+                "id": "chsl_m1",
+                "title": "SSC CHSL Practice Mock Set",
+                "questions": [
+                    {
+                        "question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?",
+                        "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"],
+                        "answer": "Daman",
+                        "explanation": "Daman was declared the capital of the merged UT in 2020."
+                    },
+                    {
+                        "question": "Simple interest on $1,000 for 2 years at 5% per annum is:",
+                        "options": ["$100", "$50", "$150", "$200"],
+                        "answer": "$100",
+                        "explanation": "SI = (P * R * T)/100 = (1000 * 5 * 2)/100 = $100."
+                    }
+                ]
+            }
         ]
     },
     "SSC GD": {
@@ -258,21 +294,33 @@ EXAMS_DATA = {
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
             "**Phase 1: Elementary Maths & Language (Months 1-2):** Basic arithmetic, Hindi/English grammar fundamentals.",
-            "**Phase 2: GK/GS & Reasoning (Months 3-4):** Static GK, Current Affairs, and Non-Verbal Reasoning.",
-            "**Phase 3: CBT Practice & Physical Training (Month 5):** Take online CBT speed mocks alongside morning physical training."
+            "**Phase 2: GK/GS & Reasoning (Months 3-4):** Static GK, Current Affairs, and Non-Verbal Reasoning."
         ],
         "top_teachers": [
-            {"subject": "General Studies & Hindi", "teacher": "Naveen Sir / Ankit Bhati Sir", "channel": "Rojgar with Ankit", "video_title": "SSC GD Complete Hindi & GS", "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+rojgar+with+ankit"},
-            {"subject": "Reasoning", "teacher": "Rahul Sir", "channel": "Rojgar with Ankit", "video_title": "GD Reasoning Special", "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+reasoning+rojgar+with+ankit"}
+            {"subject": "General Studies & Hindi", "teacher": "Naveen Sir / Ankit Bhati Sir", "channel": "Rojgar with Ankit", "video_title": "SSC GD Complete Hindi & GS", "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+rojgar+with+ankit"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC GD Constable All Shifts Official Paper", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
+            {"year": "2024", "title": "SSC GD Constable Official Shifts Paper", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
         "mocks": [
-            {"title": "SSC GD Full Length Practice Test", "questions": 80, "time": "60 Mins", "level": "Moderate"}
-        ],
-        "quiz": [
-            {"question": "Which dance form originates from the state of Assam?", "options": ["Bihu", "Kathak", "Garba", "Ghoomar"], "answer": "Bihu", "explanation": "Bihu is the traditional dance of Assam."}
+            {
+                "id": "gd_m1",
+                "title": "SSC GD General Knowledge & Reasoning Speed Mock",
+                "questions": [
+                    {
+                        "question": "Which dance form originates from the state of Assam?",
+                        "options": ["Bihu", "Kathak", "Garba", "Ghoomar"],
+                        "answer": "Bihu",
+                        "explanation": "Bihu is the folk dance of Assam associated with the Bihu festival."
+                    },
+                    {
+                        "question": "Complete the series: 2, 4, 8, 16, ?",
+                        "options": ["32", "24", "64", "20"],
+                        "answer": "32",
+                        "explanation": "Each number is multiplied by 2. 16 * 2 = 32."
+                    }
+                ]
+            }
         ]
     },
     "SSC JE": {
@@ -283,21 +331,27 @@ EXAMS_DATA = {
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
             "**Phase 1: Technical Subjects (Months 1-4):** Core concepts in Civil, Electrical, or Mechanical engineering.",
-            "**Phase 2: Non-Tech Aptitude (Months 5-6):** General Intelligence, Reasoning, and General Awareness.",
-            "**Phase 3: Paper 1 CBT & Paper 2 Subjective Practice (Months 7-8):** Practice past 10-year JE papers."
+            "**Phase 2: Non-Tech Aptitude (Months 5-6):** General Intelligence, Reasoning, and General Awareness."
         ],
         "top_teachers": [
-            {"subject": "Civil Engineering", "teacher": "Engineers Academy", "channel": "Engineers Academy", "video_title": "SSC JE Civil Complete Revision", "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+civil+engineers+academy"},
-            {"subject": "Electrical Engineering", "teacher": "Adda247 Technical", "channel": "Engineers Adda247", "video_title": "SSC JE Electrical Marathon", "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+electrical+adda247"}
+            {"subject": "Civil Engineering", "teacher": "Engineers Academy", "channel": "Engineers Academy", "video_title": "SSC JE Civil Complete Revision", "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+civil+engineers+academy"}
         ],
         "pyqs": [
             {"year": "2024", "title": "SSC JE Paper-1 (CBT) Official Question Paper", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
         "mocks": [
-            {"title": "SSC JE Paper-1 Non-Tech Speed Mock", "questions": 100, "time": "60 Mins", "level": "Moderate"}
-        ],
-        "quiz": [
-            {"question": "What is the SI unit of pressure?", "options": ["Pascal", "Joule", "Newton", "Watt"], "answer": "Pascal", "explanation": "Pascal (Pa) is the SI unit of pressure."}
+            {
+                "id": "je_m1",
+                "title": "SSC JE Non-Tech Practice Set",
+                "questions": [
+                    {
+                        "question": "What is the SI unit of pressure?",
+                        "options": ["Pascal", "Joule", "Newton", "Watt"],
+                        "answer": "Pascal",
+                        "explanation": "Pascal (Pa) equals one newton per square meter."
+                    }
+                ]
+            }
         ]
     },
     "SSC MTS": {
@@ -308,8 +362,7 @@ EXAMS_DATA = {
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
             "**Phase 1: Session 1 Prep (Months 1-2):** Basic Numerical Ability and Reasoning.",
-            "**Phase 2: Session 2 Scoring Subjects (Months 3-4):** Focus heavily on General Awareness and English vocabulary.",
-            "**Phase 3: CBT Mocks (Month 5):** Take full-length computer-based tests."
+            "**Phase 2: Session 2 Scoring Subjects (Months 3-4):** General Awareness and English vocabulary."
         ],
         "top_teachers": [
             {"subject": "General Knowledge & English", "teacher": "MTS Special Team", "channel": "SSC Adda247", "video_title": "SSC MTS GK & English Revision", "youtube_link": "https://www.youtube.com/results?search_query=ssc+mts+gk+english+preparation"}
@@ -318,10 +371,18 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC MTS All Shift Question Papers", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
         "mocks": [
-            {"title": "SSC MTS Session 1 & 2 Full Mock", "questions": 90, "time": "90 Mins", "level": "Easy-Moderate"}
-        ],
-        "quiz": [
-            {"question": "Who was the first Governor-General of Independent India?", "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], "answer": "Lord Mountbatten", "explanation": "Lord Mountbatten served as the first Governor-General after independence."}
+            {
+                "id": "mts_m1",
+                "title": "SSC MTS Practice Mock",
+                "questions": [
+                    {
+                        "question": "Who was the first Governor-General of Independent India?",
+                        "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"],
+                        "answer": "Lord Mountbatten",
+                        "explanation": "Lord Mountbatten was the first Governor-General of independent India."
+                    }
+                ]
+            }
         ]
     },
     "UPSC CSE": {
@@ -332,21 +393,33 @@ EXAMS_DATA = {
         "official_pyq_portal": "https://www.upsc.gov.in/examinations/previous-question-papers",
         "roadmap": [
             "**Phase 1: NCERT Foundations (Months 1-3):** Class 6-12 NCERTs for History, Geography, Polity, and Economy.",
-            "**Phase 2: Standard Reference Books (Months 4-8):** Laxmikanth (Polity), Spectrum (History), and Optional Subject.",
-            "**Phase 3: Answer Writing & Mocks (Months 9-12):** Daily GS answer writing practice and Prelims mocks."
+            "**Phase 2: Standard Reference Books (Months 4-8):** Laxmikanth (Polity), Spectrum (History)."
         ],
         "top_teachers": [
-            {"subject": "Indian Polity", "teacher": "Dr. Vikas Divyakirti", "channel": "Drishti IAS", "video_title": "Polity Concept Series", "youtube_link": "https://www.youtube.com/results?search_query=upsc+polity+drishti+ias"},
-            {"subject": "Economy & Budget", "teacher": "Mrunal Patel Sir", "channel": "Mrunal Patel", "video_title": "Pillarwise Economy Series", "youtube_link": "https://www.youtube.com/results?search_query=mrunal+patel+economy"}
+            {"subject": "Indian Polity", "teacher": "Dr. Vikas Divyakirti", "channel": "Drishti IAS", "video_title": "Polity Concept Series", "youtube_link": "https://www.youtube.com/results?search_query=upsc+polity+drishti+ias"}
         ],
         "pyqs": [
             {"year": "2024", "title": "UPSC CSE Prelims General Studies (Paper-I & CSAT)", "link": "https://www.upsc.gov.in/", "format": "Official PDF"}
         ],
         "mocks": [
-            {"title": "UPSC Prelims GS Paper 1 Full Mock", "questions": 100, "time": "120 Mins", "level": "Hard"}
-        ],
-        "quiz": [
-            {"question": "Which Schedule of the Indian Constitution contains the anti-defection law?", "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"], "answer": "10th Schedule", "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."}
+            {
+                "id": "upsc_m1",
+                "title": "UPSC GS Paper-1 Practice Quiz",
+                "questions": [
+                    {
+                        "question": "Which Schedule of the Indian Constitution contains the anti-defection law?",
+                        "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"],
+                        "answer": "10th Schedule",
+                        "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."
+                    },
+                    {
+                        "question": "Which river is known as the 'Sorrow of Bengal'?",
+                        "options": ["Damodar River", "Hooghly River", "Kosi River", "Brahmaputra River"],
+                        "answer": "Damodar River",
+                        "explanation": "Damodar River was historically known as the Sorrow of Bengal due to ravaging floods."
+                    }
+                ]
+            }
         ]
     },
     "NEET UG": {
@@ -357,21 +430,33 @@ EXAMS_DATA = {
         "official_pyq_portal": "https://neet.nta.nic.in/document-category/archive/",
         "roadmap": [
             "**Phase 1: NCERT Biology & Chemistry (Months 1-6):** Line-by-line mastery of Class 11 & 12 NCERTs.",
-            "**Phase 2: Physics Problem Solving (Months 7-9):** Daily numerical practice and conceptual physics.",
-            "**Phase 3: Full Syllabus Mocks (Months 10-12):** Practice 15-year past papers under timed conditions."
+            "**Phase 2: Physics Problem Solving (Months 7-9):** Daily numerical practice."
         ],
         "top_teachers": [
-            {"subject": "Biology", "teacher": "Dr. Anand Mani", "channel": "Dr. Anand Mani", "video_title": "NCERT Biology One-Shot", "youtube_link": "https://www.youtube.com/results?search_query=neet+biology+one+shot"},
-            {"subject": "Physics", "teacher": "Alakh Pandey Sir", "channel": "Physics Wallah", "video_title": "NEET Physics Complete", "youtube_link": "https://www.youtube.com/results?search_query=physics+wallah+neet+physics"}
+            {"subject": "Biology", "teacher": "Dr. Anand Mani", "channel": "Dr. Anand Mani", "video_title": "NCERT Biology One-Shot", "youtube_link": "https://www.youtube.com/results?search_query=neet+biology+one+shot"}
         ],
         "pyqs": [
             {"year": "2024", "title": "NEET UG Official Question Paper with Solutions", "link": "https://neet.nta.nic.in/", "format": "Official PDF"}
         ],
         "mocks": [
-            {"title": "NEET UG Full Length Practice Test", "questions": 200, "time": "200 Mins", "level": "Moderate-Hard"}
-        ],
-        "quiz": [
-            {"question": "Which organelle is known as the powerhouse of the cell?", "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"], "answer": "Mitochondria", "explanation": "Mitochondria produce ATP."}
+            {
+                "id": "neet_m1",
+                "title": "NEET Biology & Chemistry Drill",
+                "questions": [
+                    {
+                        "question": "Which organelle is known as the powerhouse of the cell?",
+                        "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"],
+                        "answer": "Mitochondria",
+                        "explanation": "Mitochondria generate ATP."
+                    },
+                    {
+                        "question": "What is the pH of human blood under normal physiological conditions?",
+                        "options": ["7.35 - 7.45", "6.0 - 6.5", "8.0 - 8.5", "5.5 - 6.0"],
+                        "answer": "7.35 - 7.45",
+                        "explanation": "Human blood pH is strictly regulated between 7.35 and 7.45."
+                    }
+                ]
+            }
         ]
     },
     "JEE Main & Advanced": {
@@ -381,22 +466,28 @@ EXAMS_DATA = {
         "description": "Gateway to IITs, NITs, IIITs, and premier engineering institutes.",
         "official_pyq_portal": "https://nta.ac.in/Downloads",
         "roadmap": [
-            "**Phase 1: Foundation Building (Months 1-6):** Mechanics, Organic Chemistry, and Differential Calculus.",
-            "**Phase 2: Advanced Problem Solving (Months 7-10):** Solve HC Verma, Irodov, and MS Chouhan problems.",
-            "**Phase 3: CBT Mocks (Months 11-12):** Practice computer-based mock tests."
+            "**Phase 1: Foundation Building (Months 1-6):** Mechanics, Organic Chemistry, Calculus.",
+            "**Phase 2: Advanced Problem Solving (Months 7-10):** Standard problem books."
         ],
         "top_teachers": [
-            {"subject": "Mathematics", "teacher": "NV Sir", "channel": "Unacademy Atoms", "video_title": "BounceBack Series - Maths", "youtube_link": "https://www.youtube.com/results?search_query=bounceback+maths+nv+sir"},
-            {"subject": "Chemistry", "teacher": "Sakshi Vora Ma'am", "channel": "Unacademy Atoms", "video_title": "Complete Organic Chemistry", "youtube_link": "https://www.youtube.com/results?search_query=sakshi+vora+bounceback+chemistry"}
+            {"subject": "Mathematics", "teacher": "NV Sir", "channel": "Unacademy Atoms", "video_title": "BounceBack Series - Maths", "youtube_link": "https://www.youtube.com/results?search_query=bounceback+maths+nv+sir"}
         ],
         "pyqs": [
             {"year": "2024", "title": "JEE Main Session 1 & Session 2 All Papers", "link": "https://nta.ac.in/Downloads", "format": "Official PDF Archive"}
         ],
         "mocks": [
-            {"title": "JEE Main Physics Speed Test", "questions": 30, "time": "60 Mins", "level": "Hard"}
-        ],
-        "quiz": [
-            {"question": "What is the derivative of sin(x^2) with respect to x?", "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"], "answer": "2x * cos(x^2)", "explanation": "Applies the chain rule derivative."}
+            {
+                "id": "jee_m1",
+                "title": "JEE Main Speed Practice Set",
+                "questions": [
+                    {
+                        "question": "What is the derivative of sin(x^2) with respect to x?",
+                        "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"],
+                        "answer": "2x * cos(x^2)",
+                        "explanation": "Applies the chain rule derivative: d/dx[sin(u)] = cos(u) * du/dx."
+                    }
+                ]
+            }
         ]
     }
 }
@@ -473,7 +564,7 @@ tab_goal, tab_roadmap, tab_content, tab_pyqs, tab_mocks = st.tabs([
     "🗺️ Roadmap & Strategy", 
     "📺 Curated Video Lectures", 
     "📄 PYQ Vault", 
-    "📝 Timed Mocks & Quiz"
+    "⚡ Interactive Mock Test Engine"
 ])
 
 # ------------------------------------------
@@ -615,38 +706,91 @@ with tab_pyqs:
         """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 5: MOCKS & QUIZ
+# TAB 5: ADVANCED INTERACTIVE MOCK TEST ENGINE
 # ------------------------------------------
 with tab_mocks:
-    st.subheader(f"📝 Timed Mock Tests & Quizzes - {selected_exam_name}")
+    st.subheader(f"⚡ Interactive Mock Test Engine - {selected_exam_name}")
     
-    st.markdown("### ⏱️ Sectional & Full-Length Mock Tests")
-    for mock in exam_info.get("mocks", []):
+    exam_mocks = exam_info.get("mocks", [])
+    
+    if not exam_mocks:
+        st.warning("No mock sets available for this exam yet.")
+    else:
+        # Select Mock Set
+        mock_titles = [m["title"] for m in exam_mocks]
+        selected_mock_title = st.selectbox("🎯 Select Practice Mock Set:", mock_titles)
+        selected_mock = next(m for m in exam_mocks if m["title"] == selected_mock_title)
+        
+        questions = selected_mock["questions"]
+        
         st.markdown(f"""
             <div class="glass-card">
-                <h4>🏆 {mock['title']}</h4>
-                <p>📊 <b>Questions:</b> {mock['questions']} | ⏳ <b>Time:</b> {mock['time']} | 🎯 <b>Difficulty:</b> {mock['level']}</p>
+                <h4>📝 {selected_mock['title']}</h4>
+                <p>Total Questions: <b>{len(questions)}</b> | Marking: <b>+1 for Correct, 0 for Unanswered</b></p>
             </div>
         """, unsafe_allow_html=True)
         
-    st.markdown("---")
-    st.markdown("### ❓ Quick Quiz Challenge")
-    quiz_questions = exam_info.get("quiz", [])
-    if quiz_questions:
-        with st.form(key=f"quiz_form_{selected_exam_name}"):
+        # Interactive Quiz Form
+        with st.form(key=f"mock_engine_{selected_exam_name}_{selected_mock['id']}"):
             user_answers = {}
-            for q_idx, q_data in enumerate(quiz_questions):
-                st.markdown(f"#### Q{q_idx + 1}: {q_data['question']}")
+            for q_idx, q in enumerate(questions):
+                st.markdown(f"#### Q{q_idx + 1}. {q['question']}")
                 user_answers[q_idx] = st.radio(
-                    f"Select answer for Q{q_idx + 1}:",
-                    options=q_data["options"],
-                    key=f"q_{selected_exam_name}_{q_idx}",
+                    f"Choose answer for Q{q_idx + 1}:",
+                    options=q["options"],
+                    key=f"mock_q_{selected_mock['id']}_{q_idx}",
                     index=None
                 )
-            submit_quiz = st.form_submit_button("🏆 Submit Answers")
+                st.markdown("---")
+                
+            submit_mock = st.form_submit_button("🏆 Submit Test & View Performance Breakdown", use_container_width=True)
+            
+        if submit_mock:
+            score = 0
+            correct_count = 0
+            incorrect_count = 0
+            unanswered_count = 0
+            
+            for idx, q in enumerate(questions):
+                user_ans = user_answers.get(idx)
+                if user_ans is None:
+                    unanswered_count += 1
+                elif user_ans == q["answer"]:
+                    score += 1
+                    correct_count += 1
+                else:
+                    incorrect_count += 1
 
-        if submit_quiz:
-            score = sum([1 for i, q in enumerate(quiz_questions) if user_answers.get(i) == q["answer"]])
-            st.success(f"🎯 Score: {score} / {len(quiz_questions)}")
-            for i, q in enumerate(quiz_questions):
-                st.info(f"Q{i+1} Answer: {q['answer']} — {q['explanation']}")
+            accuracy = (correct_count / (correct_count + incorrect_count) * 100) if (correct_count + incorrect_count) > 0 else 0
+
+            # Score Analytics Panel
+            st.markdown("### 📊 Performance Analytics")
+            col_s1, col_s2, col_s3, col_s4 = st.columns(4)
+            col_s1.metric("Total Score", f"{score} / {len(questions)}")
+            col_s2.metric("Accuracy Rate", f"{accuracy:.1f}%")
+            col_s3.metric("Correct Answers", correct_count)
+            col_s4.metric("Incorrect / Skipped", f"{incorrect_count} / {unanswered_count}")
+
+            st.progress(score / len(questions))
+
+            # Solutions & Explanations Breakdown
+            st.markdown("### 🔍 Detailed Solutions & Explanations")
+            for idx, q in enumerate(questions):
+                u_ans = user_answers.get(idx)
+                is_correct = (u_ans == q["answer"])
+                
+                if is_correct:
+                    badge_status = '<span class="badge badge-success">Correct</span>'
+                elif u_ans is None:
+                    badge_status = '<span class="badge badge-purple">Unanswered</span>'
+                else:
+                    badge_status = '<span class="badge badge-primary" style="background-color: #ef4444;">Incorrect</span>'
+                
+                st.markdown(f"""
+                    <div class="glass-card">
+                        <h5>Q{idx + 1}: {q['question']} {badge_status}</h5>
+                        <p><b>Your Answer:</b> {u_ans if u_ans else "Not Attempted"}</p>
+                        <p><b>Correct Answer:</b> <span style="color: #10b981;">{q['answer']}</span></p>
+                        <p style="color: #cbd5e1;"><b>💡 Explanation:</b> {q['explanation']}</p>
+                    </div>
+                """, unsafe_allow_html=True)
