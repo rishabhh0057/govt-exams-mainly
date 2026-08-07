@@ -5,97 +5,145 @@ from docx import Document
 from pptx import Presentation
 
 # ==========================================
-# 1. PAGE CONFIGURATION & STYLING
+# 1. PAGE CONFIGURATION & MODERN STYLING
 # ==========================================
 st.set_page_config(
-    page_title="Competitive Exam Prep & Goal Hub",
+    page_title="Ultimate Exam Prep & Goal Hub",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom Glassmorphic & Modern CSS Styling
 st.markdown("""
     <style>
-    .exam-card {
-        background-color: #1E222D;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #2E3440;
+    /* Dark Theme Background & Fonts */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: #f8fafc;
+    }
+    
+    /* Custom Card Styling */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 20px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
+    
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 8px;
+    }
+    .badge-primary { background-color: #3b82f6; color: white; }
+    .badge-success { background-color: #10b981; color: white; }
+    .badge-purple { background-color: #8b5cf6; color: white; }
+
+    /* Custom Buttons */
     .yt-btn {
-        display: inline-block;
-        background-color: #FF0000;
-        color: white !important;
-        padding: 10px 18px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        margin-top: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-    .yt-btn:hover { background-color: #CC0000; text-decoration: none; }
-    .download-btn {
-        display: inline-block;
-        background-color: #2563EB;
-        color: white !important;
-        padding: 8px 16px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        margin-top: 8px;
-    }
-    .download-btn:hover { background-color: #1D4ED8; text-decoration: none; }
-    .official-btn {
-        display: inline-block;
-        background-color: #10B981;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white !important;
         padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 12px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        transition: all 0.3s ease;
+    }
+    .yt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4); text-decoration: none; }
+    
+    .official-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white !important;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .official-btn:hover { text-decoration: none; transform: translateY(-2px); }
+
+    .download-link-btn {
+        display: inline-block;
+        background-color: #2563eb;
+        color: white !important;
+        padding: 8px 16px;
         border-radius: 8px;
         text-decoration: none;
-        font-weight: bold;
-        margin-bottom: 15px;
+        font-weight: 600;
+        font-size: 13px;
     }
-    .official-btn:hover { background-color: #059669; text-decoration: none; }
-    .roadmap-step {
-        border-left: 4px solid #22C55E;
-        padding-left: 15px;
-        margin-bottom: 15px;
-    }
+
     .share-btn-wa {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
         background-color: #25D366;
         color: white !important;
-        padding: 10px 16px;
-        border-radius: 8px;
+        padding: 12px;
+        border-radius: 10px;
         text-decoration: none;
         font-weight: bold;
-        margin-right: 10px;
+        text-align: center;
     }
     .share-btn-email {
-        display: inline-block;
-        background-color: #EA4335;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background-color: #ea4335;
         color: white !important;
-        padding: 10px 16px;
-        border-radius: 8px;
+        padding: 12px;
+        border-radius: 10px;
         text-decoration: none;
         font-weight: bold;
+        text-align: center;
+    }
+    
+    .roadmap-step {
+        border-left: 4px solid #3b82f6;
+        background: rgba(30, 41, 59, 0.4);
+        padding: 16px;
+        border-radius: 0 12px 12px 0;
+        margin-bottom: 16px;
     }
     </style>
 """, unsafe_allow_html=True)
 
 
 # ==========================================
-# 2. HELPER FUNCTIONS FOR DOCX & PPTX GENERATION
+# 2. DOCX & PPTX EXPORT GENERATORS
 # ==========================================
-def create_docx_plan(exam_name, daily_hours, prep_months, plan_text):
+def create_docx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     doc = Document()
-    doc.add_heading(f"Study Goal Plan: {exam_name}", level=0)
-    doc.add_paragraph(f"Target Exam: {exam_name}")
-    doc.add_paragraph(f"Preparation Timeline: {prep_months} Months")
-    doc.add_paragraph(f"Daily Allocated Time: {daily_hours} Hours")
+    doc.add_heading(f"Customized Goal Plan: {exam_name}", level=0)
+    
+    p = doc.add_paragraph()
+    p.add_run(f"Target Exam: ").bold = True
+    p.add_run(f"{exam_name}\n")
+    p.add_run(f"Aspirant Profile / Age Group: ").bold = True
+    p.add_run(f"{age_group}\n")
+    p.add_run(f"Timeline: ").bold = True
+    p.add_run(f"{prep_months} Months\n")
+    p.add_run(f"Daily Capacity: ").bold = True
+    p.add_run(f"{daily_hours} Hours/day")
+
     doc.add_heading("Detailed Strategy & Timetable", level=1)
     
     for line in plan_text.split('\n'):
@@ -107,7 +155,7 @@ def create_docx_plan(exam_name, daily_hours, prep_months, plan_text):
     bio.seek(0)
     return bio
 
-def create_pptx_plan(exam_name, daily_hours, prep_months, plan_text):
+def create_pptx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     prs = Presentation()
     
     # Title Slide
@@ -115,22 +163,22 @@ def create_pptx_plan(exam_name, daily_hours, prep_months, plan_text):
     slide = prs.slides.add_slide(title_slide_layout)
     title = slide.shapes.title
     subtitle = slide.placeholders[1]
-    title.text = f"Study Goal Plan\n{exam_name}"
-    subtitle.text = f"Timeline: {prep_months} Months | Daily Study: {daily_hours} Hours"
+    title.text = f"Goal Plan: {exam_name}"
+    subtitle.text = f"Profile: {age_group}\nTimeline: {prep_months} Months | Daily: {daily_hours} Hrs"
     
-    # Plan Details Slide
+    # Plan Content Slide
     bullet_slide_layout = prs.slide_layouts[1]
     slide2 = prs.slides.add_slide(bullet_slide_layout)
     shapes = slide2.shapes
     title_shape = shapes.title
     body_shape = shapes.placeholders[1]
-    title_shape.text = "Personalized Schedule & Strategy"
+    title_shape.text = "Execution Strategy & Daily Routine"
     
     tf = body_shape.text_frame
     tf.word_wrap = True
     
     lines = [l.strip() for l in plan_text.split('\n') if l.strip()]
-    for i, line in enumerate(lines[:10]):  # Fit core bullet points onto the slide
+    for i, line in enumerate(lines[:10]):
         p = tf.add_paragraph() if i > 0 else tf.paragraphs[0]
         p.text = line
         p.level = 0
@@ -142,143 +190,114 @@ def create_pptx_plan(exam_name, daily_hours, prep_months, plan_text):
 
 
 # ==========================================
-# 3. EXAMS DATA COLLECTION
+# 3. EXPANDED EXAM DATABASE
 # ==========================================
 EXAMS_DATA = {
     "SSC CGL": {
         "full_name": "SSC Combined Graduate Level",
         "icon": "🏛️",
         "category": "SSC Group B & C",
-        "description": "Premier exam for Inspector, Assistant Section Officer, and Tax Assistant posts.",
+        "description": "Premier national recruitment exam for Inspector, Assistant Section Officer, and Tax Officer posts.",
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
             "**Phase 1: Concepts & Core Math (Months 1-3):** Cover Advance & Arithmetic Maths, English Grammar rules, and Reasoning topics.",
-            "**Phase 2: Speed Building & PYQs (Months 4-5):** Solve 5,000+ Previous Year Questions (PYQs) with speed tricks.",
+            "**Phase 2: Speed Building & Speed Math (Months 4-5):** Solve 5,000+ Previous Year Questions (PYQs) with speed tricks.",
             "**Phase 3: Tier-1 & Tier-2 Mock Drills (Month 6):** Daily sectional tests, full mocks, and typing practice."
         ],
         "top_teachers": [
-            {
-                "subject": "Quantitative Aptitude",
-                "teacher": "Gagan Pratap Sir / Aditya Ranjan Sir",
-                "channel": "Gagan Pratap Maths / Rankers Gurukul",
-                "video_title": "SSC CGL Complete Maths Marathon",
-                "youtube_link": "https://www.youtube.com/results?search_query=ssc+cgl+maths+gagan+pratap+marathon"
-            },
-            {
-                "subject": "English Language",
-                "teacher": "Nimisha Bansal / Rani Ma'am",
-                "channel": "Nimisha Bansal / English With Rani Ma'am",
-                "video_title": "120 Rules of Grammar Complete Marathon",
-                "youtube_link": "https://www.youtube.com/results?search_query=120+rules+of+grammar+nimisha+bansal"
-            }
+            {"subject": "Quantitative Aptitude (Maths)", "teacher": "Gagan Pratap Sir", "channel": "Gagan Pratap Maths", "video_title": "Complete Maths Marathon", "youtube_link": "https://www.youtube.com/results?search_query=ssc+cgl+maths+gagan+pratap+marathon"},
+            {"subject": "Maths Practice Drills", "teacher": "Aditya Ranjan Sir", "channel": "Rankers Gurukul", "video_title": "CGL Practice Series", "youtube_link": "https://www.youtube.com/results?search_query=aditya+ranjan+sir+cgl+maths"},
+            {"subject": "English Language", "teacher": "Nimisha Bansal Ma'am", "channel": "Nimisha Bansal", "video_title": "120 Rules of Grammar Complete", "youtube_link": "https://www.youtube.com/results?search_query=120+rules+of+grammar+nimisha+bansal"},
+            {"subject": "English Vocabulary", "teacher": "Rani Ma'am", "channel": "English With Rani Ma'am", "video_title": "Vocab Root Words Series", "youtube_link": "https://www.youtube.com/results?search_query=rani+mam+vocab+marathon"},
+            {"subject": "General Studies & Static GK", "teacher": "Parmar SSC", "channel": "Parmar SSC", "video_title": "Complete Static GK Batch", "youtube_link": "https://www.youtube.com/results?search_query=parmar+ssc+gk"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC CGL Tier-1 All Shift Question Papers", "link": "https://ssc.gov.in/", "format": "PDF Archive"},
-            {"year": "2023", "title": "SSC CGL Tier-2 (Mains) Official Question Paper", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
+            {"year": "2024", "title": "SSC CGL Tier-1 All 39 Shifts Question Papers", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"},
+            {"year": "2023", "title": "SSC CGL Tier-2 (Mains) Official Question Paper", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"},
+            {"year": "2022", "title": "SSC CGL Tier-1 Previous Year Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF Download"}
+        ],
+        "mocks": [
+            {"title": "CGL Full Length Tier-1 Mock 01", "questions": 100, "time": "60 Mins", "level": "Moderate"},
+            {"title": "CGL Tier-2 Quantitative Aptitude Speed Test", "questions": 30, "time": "35 Mins", "level": "Hard"}
         ],
         "quiz": [
-            {
-                "question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?",
-                "options": ["Article 352", "Article 356", "Article 360", "Article 370"],
-                "answer": "Article 352",
-                "explanation": "Article 352 deals with National Emergency."
-            }
+            {"question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?", "options": ["Article 352", "Article 356", "Article 360", "Article 370"], "answer": "Article 352", "explanation": "Article 352 deals with National Emergency."}
         ]
     },
     "SSC CHSL": {
         "full_name": "SSC Combined Higher Secondary Level",
         "icon": "📜",
         "category": "SSC 10+2 Level",
-        "description": "Recruitment exam for Lower Division Clerk (LDC), JSA, and Data Entry Operators (DEO).",
+        "description": "National exam for Lower Division Clerk (LDC), JSA, and Data Entry Operators (DEO).",
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
-            "**Phase 1: Syllabus Overview (Months 1-2):** Master Class 10th level Quantitative Aptitude, Basic English, and Logical Reasoning.",
+            "**Phase 1: Syllabus Fundamentals (Months 1-2):** Master Class 10th level Quantitative Aptitude, Basic English, and Logical Reasoning.",
             "**Phase 2: PYQ Drill & Speed Practice (Months 3-4):** Solve CHSL papers from the last 5 years.",
             "**Phase 3: Mocks & Typing Speed (Month 5):** Conduct full-length tests and daily typing practice."
         ],
         "top_teachers": [
-            {
-                "subject": "Reasoning Ability",
-                "teacher": "Vikramjeet Sir",
-                "channel": "Rankers Gurukul",
-                "video_title": "SSC CHSL Reasoning Complete Playlist",
-                "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+vikramjeet+sir"
-            }
+            {"subject": "Reasoning Ability", "teacher": "Vikramjeet Sir", "channel": "Rankers Gurukul", "video_title": "SSC CHSL Reasoning Complete Playlist", "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+vikramjeet+sir"},
+            {"subject": "Arithmetic Maths", "teacher": "Aditya Ranjan Sir", "channel": "Rankers Gurukul", "video_title": "CHSL Maths Foundation", "youtube_link": "https://www.youtube.com/results?search_query=ssc+chsl+maths+aditya+ranjan"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC CHSL Tier-1 Papers", "link": "https://ssc.gov.in/", "format": "PDF"}
+            {"year": "2024", "title": "SSC CHSL Tier-1 Shifts Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF"},
+            {"year": "2023", "title": "SSC CHSL Tier-2 Paper Collection", "link": "https://ssc.gov.in/", "format": "PDF"}
+        ],
+        "mocks": [
+            {"title": "CHSL Speed Booster Mock Test", "questions": 100, "time": "60 Mins", "level": "Easy-Moderate"}
         ],
         "quiz": [
-            {
-                "question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?",
-                "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"],
-                "answer": "Daman",
-                "explanation": "Daman was declared the capital of the merged UT in 2020."
-            }
+            {"question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?", "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"], "answer": "Daman", "explanation": "Daman was declared the capital of the merged UT in 2020."}
         ]
     },
     "SSC GD": {
         "full_name": "SSC General Duty Constable",
         "icon": "🪖",
         "category": "SSC Defense & Paramilitary",
-        "description": "Entrance for Constables in BSF, CISF, CRPF, SSB, ITBP, AR, and SSF.",
+        "description": "Entrance exam for Constables in BSF, CISF, CRPF, SSB, ITBP, AR, and SSF.",
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
-            "**Phase 1: Basics of Elementary Maths & Hindi/English (Months 1-2):** Practice basic arithmetic and grammar fundamentals.",
-            "**Phase 2: GK/GS & Reasoning Drills (Months 3-4):** Focus on Static GK, Current Affairs, and Non-Verbal Reasoning.",
-            "**Phase 3: Practice Tests & Physical Prep (Month 5):** Take online CBT speed mocks alongside morning physical training."
+            "**Phase 1: Elementary Maths & Language (Months 1-2):** Basic arithmetic, Hindi/English grammar fundamentals.",
+            "**Phase 2: GK/GS & Reasoning (Months 3-4):** Static GK, Current Affairs, and Non-Verbal Reasoning.",
+            "**Phase 3: CBT Practice & Physical Training (Month 5):** Take online CBT speed mocks alongside morning physical training."
         ],
         "top_teachers": [
-            {
-                "subject": "General Studies & Hindi",
-                "teacher": "Naveen Sir / Ankit Bhati Sir",
-                "channel": "Rojgar with Ankit",
-                "video_title": "SSC GD Complete Hindi & GS Practice",
-                "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+rojgar+with+ankit"
-            }
+            {"subject": "General Studies & Hindi", "teacher": "Naveen Sir / Ankit Bhati Sir", "channel": "Rojgar with Ankit", "video_title": "SSC GD Complete Hindi & GS", "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+rojgar+with+ankit"},
+            {"subject": "Reasoning", "teacher": "Rahul Sir", "channel": "Rojgar with Ankit", "video_title": "GD Reasoning Special", "youtube_link": "https://www.youtube.com/results?search_query=ssc+gd+reasoning+rojgar+with+ankit"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "SSC GD Constable Official Shifts Paper", "link": "https://ssc.gov.in/", "format": "PDF"}
+            {"year": "2024", "title": "SSC GD Constable All Shifts Official Paper", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
+        ],
+        "mocks": [
+            {"title": "SSC GD Full Length Practice Test", "questions": 80, "time": "60 Mins", "level": "Moderate"}
         ],
         "quiz": [
-            {
-                "question": "Which dance form originates from the state of Assam?",
-                "options": ["Bihu", "Kathak", "Garba", "Ghoomar"],
-                "answer": "Bihu",
-                "explanation": "Bihu is the folk dance of Assam associated with the Bihu festival."
-            }
+            {"question": "Which dance form originates from the state of Assam?", "options": ["Bihu", "Kathak", "Garba", "Ghoomar"], "answer": "Bihu", "explanation": "Bihu is the traditional dance of Assam."}
         ]
     },
     "SSC JE": {
-        "full_name": "SSC Junior Engineer (Civil, Electrical, Mechanical)",
+        "full_name": "SSC Junior Engineer",
         "icon": "🏗️",
-        "category": "SSC Technical Engineering",
-        "description": "Recruitment exam for Junior Engineers in CPWD, CWP&PRS, MES, and Central Water Commission.",
+        "category": "Technical Engineering",
+        "description": "Recruitment exam for Junior Engineers in CPWD, MES, and Central Water Commission.",
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
-            "**Phase 1: Technical Engineering Fundamentals (Months 1-4):** Strengthen core concepts in Civil, Electrical, or Mechanical engineering.",
-            "**Phase 2: Non-Tech Preparation (Months 5-6):** Prepare General Intelligence, Reasoning, and General Awareness.",
-            "**Phase 3: Paper 1 CBT & Paper 2 Subjective Practice (Months 7-8):** Practice past 10-year JE papers and mock tests."
+            "**Phase 1: Technical Subjects (Months 1-4):** Core concepts in Civil, Electrical, or Mechanical engineering.",
+            "**Phase 2: Non-Tech Aptitude (Months 5-6):** General Intelligence, Reasoning, and General Awareness.",
+            "**Phase 3: Paper 1 CBT & Paper 2 Subjective Practice (Months 7-8):** Practice past 10-year JE papers."
         ],
         "top_teachers": [
-            {
-                "subject": "Technical Engineering Subjects",
-                "teacher": "Engineers Academy / Adda247 Technical",
-                "channel": "Engineers Academy",
-                "video_title": "SSC JE Complete Technical Revision",
-                "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+technical+revision"
-            }
+            {"subject": "Civil Engineering", "teacher": "Engineers Academy", "channel": "Engineers Academy", "video_title": "SSC JE Civil Complete Revision", "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+civil+engineers+academy"},
+            {"subject": "Electrical Engineering", "teacher": "Adda247 Technical", "channel": "Engineers Adda247", "video_title": "SSC JE Electrical Marathon", "youtube_link": "https://www.youtube.com/results?search_query=ssc+je+electrical+adda247"}
         ],
         "pyqs": [
             {"year": "2024", "title": "SSC JE Paper-1 (CBT) Official Question Paper", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
+        "mocks": [
+            {"title": "SSC JE Paper-1 Non-Tech Speed Mock", "questions": 100, "time": "60 Mins", "level": "Moderate"}
+        ],
         "quiz": [
-            {
-                "question": "What is the SI unit of pressure?",
-                "options": ["Pascal", "Joule", "Newton", "Watt"],
-                "answer": "Pascal",
-                "explanation": "Pascal (Pa) equals one newton per square meter."
-            }
+            {"question": "What is the SI unit of pressure?", "options": ["Pascal", "Joule", "Newton", "Watt"], "answer": "Pascal", "explanation": "Pascal (Pa) is the SI unit of pressure."}
         ]
     },
     "SSC MTS": {
@@ -288,265 +307,204 @@ EXAMS_DATA = {
         "description": "Selection for non-technical General Central Service Group 'C' Posts.",
         "official_pyq_portal": "https://ssc.gov.in/",
         "roadmap": [
-            "**Phase 1: Core Numerical Ability & Reasoning (Session 1) (Months 1-2):** Master fundamental math and logical reasoning.",
-            "**Phase 2: English & General Awareness (Session 2) (Months 3-4):** Focus heavily on General Knowledge and English vocabulary, which determine selection.",
-            "**Phase 3: Mock Tests & Revision (Month 5):** Take Session 1 & 2 full-length online computer-based tests."
+            "**Phase 1: Session 1 Prep (Months 1-2):** Basic Numerical Ability and Reasoning.",
+            "**Phase 2: Session 2 Scoring Subjects (Months 3-4):** Focus heavily on General Awareness and English vocabulary.",
+            "**Phase 3: CBT Mocks (Month 5):** Take full-length computer-based tests."
         ],
         "top_teachers": [
-            {
-                "subject": "General Awareness & English",
-                "teacher": "MTS Special Educators",
-                "channel": "SSC Adda247 / Testbook",
-                "video_title": "SSC MTS General Knowledge & English Revision",
-                "youtube_link": "https://www.youtube.com/results?search_query=ssc+mts+gk+english+preparation"
-            }
+            {"subject": "General Knowledge & English", "teacher": "MTS Special Team", "channel": "SSC Adda247", "video_title": "SSC MTS GK & English Revision", "youtube_link": "https://www.youtube.com/results?search_query=ssc+mts+gk+english+preparation"}
         ],
         "pyqs": [
             {"year": "2024", "title": "SSC MTS All Shift Question Papers", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
+        "mocks": [
+            {"title": "SSC MTS Session 1 & 2 Full Mock", "questions": 90, "time": "90 Mins", "level": "Easy-Moderate"}
+        ],
         "quiz": [
-            {
-                "question": "Who was the first Governor-General of Independent India?",
-                "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"],
-                "answer": "Lord Mountbatten",
-                "explanation": "Lord Mountbatten was the last Viceroy and first Governor-General of independent India."
-            }
+            {"question": "Who was the first Governor-General of Independent India?", "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], "answer": "Lord Mountbatten", "explanation": "Lord Mountbatten served as the first Governor-General after independence."}
         ]
     },
     "UPSC CSE": {
         "full_name": "UPSC Civil Services Examination",
         "icon": "⚖️",
         "category": "Civil Services",
-        "description": "Preparation roadmap for IAS, IPS, IFS, and Central Services.",
+        "description": "India's premier exam for IAS, IPS, IFS, and Central Services.",
         "official_pyq_portal": "https://www.upsc.gov.in/examinations/previous-question-papers",
         "roadmap": [
-            "**Phase 1: NCERT Foundations (Months 1-3):** Read Class 6-12 NCERTs for History, Geography, Polity, and Economy.",
-            "**Phase 2: Standard Books & Optional Subject (Months 4-8):** Study Laxmikanth (Polity) and Spectrum.",
+            "**Phase 1: NCERT Foundations (Months 1-3):** Class 6-12 NCERTs for History, Geography, Polity, and Economy.",
+            "**Phase 2: Standard Reference Books (Months 4-8):** Laxmikanth (Polity), Spectrum (History), and Optional Subject.",
             "**Phase 3: Answer Writing & Mocks (Months 9-12):** Daily GS answer writing practice and Prelims mocks."
         ],
         "top_teachers": [
-            {
-                "subject": "Indian Polity",
-                "teacher": "Dr. Vikas Divyakirti",
-                "channel": "Drishti IAS",
-                "video_title": "Indian Polity Complete Concept Series",
-                "youtube_link": "https://www.youtube.com/results?search_query=upsc+polity+drishti+ias"
-            }
+            {"subject": "Indian Polity", "teacher": "Dr. Vikas Divyakirti", "channel": "Drishti IAS", "video_title": "Polity Concept Series", "youtube_link": "https://www.youtube.com/results?search_query=upsc+polity+drishti+ias"},
+            {"subject": "Economy & Budget", "teacher": "Mrunal Patel Sir", "channel": "Mrunal Patel", "video_title": "Pillarwise Economy Series", "youtube_link": "https://www.youtube.com/results?search_query=mrunal+patel+economy"}
         ],
         "pyqs": [
             {"year": "2024", "title": "UPSC CSE Prelims General Studies (Paper-I & CSAT)", "link": "https://www.upsc.gov.in/", "format": "Official PDF"}
         ],
+        "mocks": [
+            {"title": "UPSC Prelims GS Paper 1 Full Mock", "questions": 100, "time": "120 Mins", "level": "Hard"}
+        ],
         "quiz": [
-            {
-                "question": "Which Schedule of the Indian Constitution contains the anti-defection law?",
-                "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"],
-                "answer": "10th Schedule",
-                "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."
-            }
+            {"question": "Which Schedule of the Indian Constitution contains the anti-defection law?", "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"], "answer": "10th Schedule", "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."}
         ]
     },
     "NEET UG": {
         "full_name": "National Eligibility cum Entrance Test",
         "icon": "🩺",
         "category": "Medical Entrance",
-        "description": "Targeted learning path for MBBS/BDS entrance aspirants.",
+        "description": "National entrance exam for admission into MBBS, BDS, and AYUSH courses.",
         "official_pyq_portal": "https://neet.nta.nic.in/document-category/archive/",
         "roadmap": [
-            "**Phase 1: NCERT Mastery (Months 1-6):** Line-by-line reading of Class 11 & 12 NCERT Biology, Chemistry, and Physics.",
-            "**Phase 2: Problem Solving (Months 7-9):** Practice Physics numericals daily.",
-            "**Phase 3: Mock Testing (Months 10-12):** Solve 15-year PYQs and speed tests."
+            "**Phase 1: NCERT Biology & Chemistry (Months 1-6):** Line-by-line mastery of Class 11 & 12 NCERTs.",
+            "**Phase 2: Physics Problem Solving (Months 7-9):** Daily numerical practice and conceptual physics.",
+            "**Phase 3: Full Syllabus Mocks (Months 10-12):** Practice 15-year past papers under timed conditions."
         ],
         "top_teachers": [
-            {
-                "subject": "Biology",
-                "teacher": "Dr. Anand Mani",
-                "channel": "Dr. Anand Mani",
-                "video_title": "Complete NCERT Biology One-Shot",
-                "youtube_link": "https://www.youtube.com/results?search_query=neet+biology+one+shot"
-            }
+            {"subject": "Biology", "teacher": "Dr. Anand Mani", "channel": "Dr. Anand Mani", "video_title": "NCERT Biology One-Shot", "youtube_link": "https://www.youtube.com/results?search_query=neet+biology+one+shot"},
+            {"subject": "Physics", "teacher": "Alakh Pandey Sir", "channel": "Physics Wallah", "video_title": "NEET Physics Complete", "youtube_link": "https://www.youtube.com/results?search_query=physics+wallah+neet+physics"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "NEET UG Official Question Paper", "link": "https://neet.nta.nic.in/", "format": "Official NTA PDF"}
+            {"year": "2024", "title": "NEET UG Official Question Paper with Solutions", "link": "https://neet.nta.nic.in/", "format": "Official PDF"}
+        ],
+        "mocks": [
+            {"title": "NEET UG Full Length Practice Test", "questions": 200, "time": "200 Mins", "level": "Moderate-Hard"}
         ],
         "quiz": [
-            {
-                "question": "Which organelle is known as the powerhouse of the cell?",
-                "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"],
-                "answer": "Mitochondria",
-                "explanation": "Mitochondria produce ATP."
-            }
+            {"question": "Which organelle is known as the powerhouse of the cell?", "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"], "answer": "Mitochondria", "explanation": "Mitochondria produce ATP."}
         ]
     },
     "JEE Main & Advanced": {
         "full_name": "Joint Entrance Examination",
         "icon": "📐",
         "category": "Engineering Entrance",
-        "description": "Preparation pathway for IITs, NITs, and top engineering institutions.",
+        "description": "Gateway to IITs, NITs, IIITs, and premier engineering institutes.",
         "official_pyq_portal": "https://nta.ac.in/Downloads",
         "roadmap": [
-            "**Phase 1: Conceptual Clarity (Months 1-6):** Master Mechanics, Organic Chemistry, and Calculus.",
-            "**Phase 2: Advanced Problem Solving (Months 7-10):** Solve HC Verma and MS Chouhan.",
+            "**Phase 1: Foundation Building (Months 1-6):** Mechanics, Organic Chemistry, and Differential Calculus.",
+            "**Phase 2: Advanced Problem Solving (Months 7-10):** Solve HC Verma, Irodov, and MS Chouhan problems.",
             "**Phase 3: CBT Mocks (Months 11-12):** Practice computer-based mock tests."
         ],
         "top_teachers": [
-            {
-                "subject": "Mathematics",
-                "teacher": "NV Sir",
-                "channel": "Unacademy Atoms",
-                "video_title": "BounceBack Series - Complete JEE Maths",
-                "youtube_link": "https://www.youtube.com/results?search_query=bounceback+maths+nv+sir"
-            }
+            {"subject": "Mathematics", "teacher": "NV Sir", "channel": "Unacademy Atoms", "video_title": "BounceBack Series - Maths", "youtube_link": "https://www.youtube.com/results?search_query=bounceback+maths+nv+sir"},
+            {"subject": "Chemistry", "teacher": "Sakshi Vora Ma'am", "channel": "Unacademy Atoms", "video_title": "Complete Organic Chemistry", "youtube_link": "https://www.youtube.com/results?search_query=sakshi+vora+bounceback+chemistry"}
         ],
         "pyqs": [
-            {"year": "2024", "title": "JEE Main Session 1 & Session 2 Papers", "link": "https://nta.ac.in/Downloads", "format": "Official NTA PDF"}
+            {"year": "2024", "title": "JEE Main Session 1 & Session 2 All Papers", "link": "https://nta.ac.in/Downloads", "format": "Official PDF Archive"}
+        ],
+        "mocks": [
+            {"title": "JEE Main Physics Speed Test", "questions": 30, "time": "60 Mins", "level": "Hard"}
         ],
         "quiz": [
-            {
-                "question": "What is the derivative of sin(x^2) with respect to x?",
-                "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"],
-                "answer": "2x * cos(x^2)",
-                "explanation": "Chain rule application."
-            }
+            {"question": "What is the derivative of sin(x^2) with respect to x?", "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"], "answer": "2x * cos(x^2)", "explanation": "Applies the chain rule derivative."}
         ]
     }
 }
 
+AGE_GROUPS = {
+    "14 - 18 Years (School Students)": "Focus on balancing school/boards with foundational exam preparation.",
+    "18 - 22 Years (College / Undergrads)": "Focus on parallel study schedules, college exams, and core conceptual preparation.",
+    "22 - 28 Years (Working / Full-Time Prep)": "Focus on intense high-efficiency sessions, daily mock drills, and speed mastery.",
+    "28+ Years (Senior Aspirants)": "Focus on high-yield selective studying, strategic time management, and mock analysis."
+}
+
 
 # ==========================================
-# 4. SIDEBAR - MAIN NAVIGATION
+# 4. ALL CONTROL SLIDERS CONSOLIDATED IN SIDEBAR
 # ==========================================
-st.sidebar.title("🎓 Navigation & Selection")
-st.sidebar.markdown("### 🎛️ Browse Exam Hub")
+st.sidebar.title("⚙️ Personalization Hub")
+st.sidebar.markdown("### 🎛️ Configure Your Profile")
 
 exam_list = list(EXAMS_DATA.keys())
 
-# Main Sidebar Exam Selector
-selected_exam_name = st.sidebar.selectbox(
-    "Select Exam to Explore Resources:",
+# 1. Target Exam Selection Slider
+st.sidebar.markdown("**1. Select Target Exam:**")
+selected_exam_name = st.sidebar.select_slider(
+    "Target Exam Slider",
     options=exam_list,
-    index=0
+    value=exam_list[0],
+    format_func=lambda x: f"{EXAMS_DATA[x]['icon']} {x}",
+    label_visibility="collapsed"
 )
+
+# 2. Age Group Selector
+st.sidebar.markdown("---")
+st.sidebar.markdown("**2. Aspirant Age Group / Category:**")
+selected_age_group = st.sidebar.selectbox(
+    "Age Group Selector",
+    options=list(AGE_GROUPS.keys()),
+    index=1,
+    label_visibility="collapsed"
+)
+
+# 3. Daily Hours Capacity Slider
+st.sidebar.markdown("---")
+st.sidebar.markdown("**3. Daily Available Time (Hours):**")
+daily_hours = st.sidebar.slider("Daily Hours Slider", 2, 14, 6, label_visibility="collapsed")
+
+# 4. Months Remaining Slider
+st.sidebar.markdown("**4. Months Remaining for Exam:**")
+prep_months = st.sidebar.slider("Prep Months Slider", 1, 24, 6, label_visibility="collapsed")
+
+st.sidebar.markdown("---")
+st.sidebar.caption("🔑 **Optional Groq AI Key:**")
+api_key = st.sidebar.text_input("Groq API Key", type="password", label_visibility="collapsed")
 
 exam_info = EXAMS_DATA[selected_exam_name]
 
-st.sidebar.markdown("---")
-st.sidebar.info(f"**Selected:** {exam_info['full_name']}\n\n**Category:** {exam_info['category']}")
-
 
 # ==========================================
-# 5. MAIN CONTENT & TABS NAVIGATION
+# 5. MAIN DASHBOARD CONTENT & NAVIGATION
 # ==========================================
-st.title("🎓 All-in-One Competitive Exam Prep Hub")
-st.header(f"{exam_info['icon']} {selected_exam_name}")
-st.write(f"**Full Title:** {exam_info['full_name']}")
-st.write(f"**Category:** {exam_info['category']}")
-st.info(exam_info['description'])
+# Header Banner
+st.markdown(f"""
+    <div class="glass-card">
+        <span class="badge badge-primary">{exam_info['category']}</span>
+        <span class="badge badge-purple">{selected_age_group}</span>
+        <h1 style="margin-top: 10px; margin-bottom: 5px;">{exam_info['icon']} {selected_exam_name}</h1>
+        <h4 style="color: #94a3b8; font-weight: 400; margin-bottom: 10px;">{exam_info['full_name']}</h4>
+        <p style="color: #cbd5e1; font-size: 15px;">{exam_info['description']}</p>
+    </div>
+""", unsafe_allow_html=True)
 
-tab_roadmap, tab_content, tab_pyqs, tab_quiz, tab_custom = st.tabs([
-    "🗺️ Preparation Roadmap", 
-    "📺 Free Lectures", 
-    "📄 PYQ Downloads", 
-    "📝 MCQ Practice Quiz",
-    "🤖 Custom Goal Planner"
+# Tabs
+tab_goal, tab_roadmap, tab_content, tab_pyqs, tab_mocks = st.tabs([
+    "🎯 Custom Goal Planner",
+    "🗺️ Roadmap & Strategy", 
+    "📺 Curated Video Lectures", 
+    "📄 PYQ Vault", 
+    "📝 Timed Mocks & Quiz"
 ])
 
-# TAB 1: ROADMAP
-with tab_roadmap:
-    st.subheader(f"📌 Step-by-Step Preparation Strategy - {selected_exam_name}")
-    for step in exam_info["roadmap"]:
-        st.markdown(f"<div class='roadmap-step'>{step}</div>", unsafe_allow_html=True)
-
-# TAB 2: TEACHERS
-with tab_content:
-    st.subheader(f"📺 Top Free Content & Video Links - {selected_exam_name}")
-    cols = st.columns(2)
-    for idx, item in enumerate(exam_info["top_teachers"]):
-        col = cols[idx % 2]
-        with col:
-            st.markdown(f"#### 📖 {item['subject']}")
-            st.write(f"👨‍🏫 **Educator:** {item['teacher']}")
-            st.write(f"📢 **Channel:** {item['channel']}")
-            st.markdown(
-                f'<a href="{item["youtube_link"]}" target="_blank" class="yt-btn">▶️ Watch Live on YouTube</a>',
-                unsafe_allow_html=True
-            )
-            st.write("")
-
-# TAB 3: PYQs
-with tab_pyqs:
-    st.subheader(f"📄 PYQ Download Papers - {selected_exam_name}")
-    st.markdown(
-        f'<a href="{exam_info["official_pyq_portal"]}" target="_blank" class="official-btn">🌐 Open Official Portal</a>',
-        unsafe_allow_html=True
-    )
-    for pyq in exam_info["pyqs"]:
-        st.markdown(f"### 🗓️ {pyq['year']} - {pyq['title']}")
-        st.markdown(f'<a href="{pyq["link"]}" target="_blank" class="download-btn">📥 Access Paper</a>', unsafe_allow_html=True)
-        st.markdown("---")
-
-# TAB 4: QUIZ
-with tab_quiz:
-    st.subheader(f"📝 Practice Quiz - {selected_exam_name}")
-    quiz_questions = exam_info.get("quiz", [])
-    if quiz_questions:
-        with st.form(key=f"quiz_form_{selected_exam_name}"):
-            user_answers = {}
-            for q_idx, q_data in enumerate(quiz_questions):
-                st.markdown(f"#### Q{q_idx + 1}: {q_data['question']}")
-                user_answers[q_idx] = st.radio(
-                    f"Select answer for Q{q_idx + 1}:",
-                    options=q_data["options"],
-                    key=f"q_{selected_exam_name}_{q_idx}",
-                    index=None
-                )
-            submit_quiz = st.form_submit_button("🏆 Submit & View Score")
-
-        if submit_quiz:
-            score = sum([1 for i, q in enumerate(quiz_questions) if user_answers.get(i) == q["answer"]])
-            st.success(f"🎯 Your Score: {score} / {len(quiz_questions)}")
-
-# TAB 5: AI CUSTOM GOAL PLANNER WITH EXAM SLIDER/SELECTOR
-with tab_custom:
-    st.subheader("🤖 Generate & Export Customized Goal Plan")
-    st.markdown("Configure your specific targeted exam and daily routine to generate a downloadable plan.")
-
-    # Slider / Select control to pick targeted exam directly inside Custom Planner
-    custom_exam_options = exam_list + ["Custom / Other Exam"]
+# ------------------------------------------
+# TAB 1: CUSTOM GOAL PLANNER
+# ------------------------------------------
+with tab_goal:
+    st.subheader("🤖 Generate & Download Personal Goal Plan")
+    st.markdown("Your study routine will be dynamically customized based on the parameters set in your sidebar.")
     
-    targeted_exam = st.select_slider(
-        "🎯 Slide to select your targeted exam for the Goal Plan:",
-        options=custom_exam_options,
-        value=selected_exam_name,
-        format_func=lambda x: f"🎓 {x}"
-    )
+    col_info1, col_info2, col_info3 = st.columns(3)
+    col_info1.metric("Selected Exam", selected_exam_name)
+    col_info2.metric("Target Profile", selected_age_group.split(' ')[0] + " Yrs")
+    col_info3.metric("Daily Schedule", f"{daily_hours} Hrs / day")
 
-    # Optional custom exam input if 'Custom / Other Exam' is selected
-    if targeted_exam == "Custom / Other Exam":
-        final_exam_title = st.text_input("Enter your Custom Exam Name:", value="Competitive Exam Target")
-    else:
-        final_exam_title = targeted_exam
-
-    st.markdown("---")
-    
-    col_a, col_b = st.columns(2)
-    daily_hours = col_a.slider("Daily study capacity (Hours):", 2, 14, 6)
-    prep_months = col_b.slider("Months remaining for exam:", 1, 24, 6)
-    api_key = st.text_input("🔑 Groq API Key (Optional)", type="password")
-
-    if st.button("🚀 Generate Goal Plan"):
+    if st.button("🚀 Generate Customized Goal Plan", use_container_width=True):
         if not api_key:
-            plan_content = f"""Target Exam: {final_exam_title}
-Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
+            plan_content = f"""Target Exam: {selected_exam_name} ({exam_info['full_name']})
+Aspirant Profile: {selected_age_group}
+Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours/day
 
-• Slot 1 ({int(daily_hours * 0.4)} hrs): Core Technical / High Priority Subject (Fresh mind session).
-• Slot 2 ({int(daily_hours * 0.3)} hrs): Secondary Subject & Problem Sets / PYQs.
-• Slot 3 ({int(daily_hours * 0.2)} hrs): Speed Tests, Mocks & Error Analysis.
-• Slot 4 ({round(daily_hours * 0.1, 1)} hrs): Daily Current Affairs & Formulas Review before sleep."""
+• Profile Strategy: {AGE_GROUPS[selected_age_group]}
+
+• Morning Session ({int(daily_hours * 0.4)} hrs): Core Technical / High-Priority Conceptual Subject.
+• Afternoon Session ({int(daily_hours * 0.3)} hrs): Secondary Subject Practice & Speed Building.
+• Evening Session ({int(daily_hours * 0.2)} hrs): Previous Year Questions (PYQs) & Sectional Tests.
+• Night Review ({round(daily_hours * 0.1, 1)} hrs): Daily Current Affairs, Formulas & Mistake Notebook Revision."""
         else:
             try:
                 from groq import Groq
                 client = Groq(api_key=api_key)
-                prompt = f"Create a structured daily study plan for {final_exam_title} with {daily_hours} hours available daily and {prep_months} months remaining."
+                prompt = f"Create a detailed daily study plan for {selected_exam_name} tailored for a {selected_age_group} student with {daily_hours} hours available daily and {prep_months} months remaining."
                 response = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[{"role": "user", "content": prompt}]
@@ -557,22 +515,22 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
                 plan_content = "Default Goal Plan Generated."
 
         st.session_state['generated_plan'] = plan_content
-        st.session_state['plan_exam'] = final_exam_title
+        st.session_state['plan_exam'] = selected_exam_name
+        st.session_state['plan_age'] = selected_age_group
         st.session_state['plan_hours'] = daily_hours
         st.session_state['plan_months'] = prep_months
 
-    # Display generated plan and export/share tools if present
     if 'generated_plan' in st.session_state:
         st.markdown("---")
-        st.markdown(f"### 📋 Generated Study Plan for {st.session_state['plan_exam']}")
-        st.text_area("Your Custom Plan", st.session_state['generated_plan'], height=200)
+        st.markdown(f"### 📋 Personal Study Goal Plan for {st.session_state['plan_exam']}")
+        st.text_area("Your Generated Plan", st.session_state['generated_plan'], height=220)
 
         st.markdown("### 📥 Download Plan File")
         col_doc, col_ppt = st.columns(2)
 
-        # Generate Word Document
         docx_file = create_docx_plan(
             st.session_state['plan_exam'],
+            st.session_state['plan_age'],
             st.session_state['plan_hours'],
             st.session_state['plan_months'],
             st.session_state['generated_plan']
@@ -585,9 +543,9 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
             use_container_width=True
         )
 
-        # Generate PowerPoint Presentation
         pptx_file = create_pptx_plan(
             st.session_state['plan_exam'],
+            st.session_state['plan_age'],
             st.session_state['plan_hours'],
             st.session_state['plan_months'],
             st.session_state['generated_plan']
@@ -601,8 +559,6 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
         )
 
         st.markdown("### 📲 Share Goal Plan")
-        
-        # Prepare URL encoded messages
         share_text = f"My Study Goal Plan for {st.session_state['plan_exam']}:\n\n{st.session_state['generated_plan']}"
         encoded_text = urllib.parse.quote(share_text)
         
@@ -610,11 +566,87 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours
         email_url = f"mailto:?subject={urllib.parse.quote('My Study Goal Plan')}&body={encoded_text}"
 
         col_wa, col_em = st.columns(2)
-        col_wa.markdown(
-            f'<a href="{whatsapp_url}" target="_blank" class="share-btn-wa">💬 Share via WhatsApp</a>',
-            unsafe_allow_html=True
-        )
-        col_em.markdown(
-            f'<a href="{email_url}" target="_blank" class="share-btn-email">✉️ Share via Email</a>',
-            unsafe_allow_html=True
-        )
+        col_wa.markdown(f'<a href="{whatsapp_url}" target="_blank" class="share-btn-wa">💬 Share via WhatsApp</a>', unsafe_allow_html=True)
+        col_em.markdown(f'<a href="{email_url}" target="_blank" class="share-btn-email">✉️ Share via Email</a>', unsafe_allow_html=True)
+
+# ------------------------------------------
+# TAB 2: ROADMAP
+# ------------------------------------------
+with tab_roadmap:
+    st.subheader(f"📌 Preparation Strategy - {selected_exam_name}")
+    for step in exam_info["roadmap"]:
+        st.markdown(f"<div class='roadmap-step'>{step}</div>", unsafe_allow_html=True)
+
+# ------------------------------------------
+# TAB 3: VIDEO LECTURES
+# ------------------------------------------
+with tab_content:
+    st.subheader(f"📺 Master Class Video Lectures - {selected_exam_name}")
+    cols = st.columns(2)
+    for idx, item in enumerate(exam_info["top_teachers"]):
+        col = cols[idx % 2]
+        with col:
+            st.markdown(f"""
+                <div class="glass-card">
+                    <h4>📖 {item['subject']}</h4>
+                    <p style="margin-bottom: 4px;">👨‍🏫 <b>Educator:</b> {item['teacher']}</p>
+                    <p style="margin-bottom: 4px;">📢 <b>Channel:</b> {item['channel']}</p>
+                    <p style="margin-bottom: 10px;">🎥 <b>Title:</b> {item['video_title']}</p>
+                    <a href="{item['youtube_link']}" target="_blank" class="yt-btn">▶️ Watch Playlist on YouTube</a>
+                </div>
+            """, unsafe_allow_html=True)
+
+# ------------------------------------------
+# TAB 4: PYQs
+# ------------------------------------------
+with tab_pyqs:
+    st.subheader(f"📄 Official PYQ Archive - {selected_exam_name}")
+    st.markdown(f'<a href="{exam_info["official_pyq_portal"]}" target="_blank" class="official-btn">🌐 Open Official Exam Portal</a>', unsafe_allow_html=True)
+    
+    for pyq in exam_info["pyqs"]:
+        st.markdown(f"""
+            <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3>🗓️ {pyq['year']} - {pyq['title']}</h3>
+                    <span class="badge badge-success">{pyq['format']}</span>
+                </div>
+                <a href="{pyq['link']}" target="_blank" class="download-link-btn">📥 Access Papers</a>
+            </div>
+        """, unsafe_allow_html=True)
+
+# ------------------------------------------
+# TAB 5: MOCKS & QUIZ
+# ------------------------------------------
+with tab_mocks:
+    st.subheader(f"📝 Timed Mock Tests & Quizzes - {selected_exam_name}")
+    
+    st.markdown("### ⏱️ Sectional & Full-Length Mock Tests")
+    for mock in exam_info.get("mocks", []):
+        st.markdown(f"""
+            <div class="glass-card">
+                <h4>🏆 {mock['title']}</h4>
+                <p>📊 <b>Questions:</b> {mock['questions']} | ⏳ <b>Time:</b> {mock['time']} | 🎯 <b>Difficulty:</b> {mock['level']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("---")
+    st.markdown("### ❓ Quick Quiz Challenge")
+    quiz_questions = exam_info.get("quiz", [])
+    if quiz_questions:
+        with st.form(key=f"quiz_form_{selected_exam_name}"):
+            user_answers = {}
+            for q_idx, q_data in enumerate(quiz_questions):
+                st.markdown(f"#### Q{q_idx + 1}: {q_data['question']}")
+                user_answers[q_idx] = st.radio(
+                    f"Select answer for Q{q_idx + 1}:",
+                    options=q_data["options"],
+                    key=f"q_{selected_exam_name}_{q_idx}",
+                    index=None
+                )
+            submit_quiz = st.form_submit_button("🏆 Submit Answers")
+
+        if submit_quiz:
+            score = sum([1 for i, q in enumerate(quiz_questions) if user_answers.get(i) == q["answer"]])
+            st.success(f"🎯 Score: {score} / {len(quiz_questions)}")
+            for i, q in enumerate(quiz_questions):
+                st.info(f"Q{i+1} Answer: {q['answer']} — {q['explanation']}")
