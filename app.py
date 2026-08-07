@@ -424,17 +424,16 @@ st.caption("Select your targeted exam below to unlock curated teacher content, s
 
 st.markdown("### 🎛️ Select Your Targeted Exam")
 
-# Slider for Exam Selection
 exam_list = list(EXAMS_DATA.keys())
-selected_index = st.slider(
+
+# Safe select slider implementation preventing type mismatch errors
+selected_exam_name = st.select_slider(
     "Slide to browse exams:",
-    min_value=0,
-    max_value=len(exam_list) - 1,
-    value=0,
-    format_func=lambda i: f"{EXAMS_DATA[exam_list[i]]['icon']} {exam_list[i]}"
+    options=exam_list,
+    value=exam_list[0],
+    format_func=lambda exam: f"{EXAMS_DATA[exam]['icon']} {exam}"
 )
 
-selected_exam_name = exam_list[selected_index]
 exam_info = EXAMS_DATA[selected_exam_name]
 
 st.markdown("---")
