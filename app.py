@@ -1,4 +1,5 @@
 import io
+import random
 import time
 import urllib.parse
 import streamlit as st
@@ -210,7 +211,7 @@ def text_to_speech(text):
 
 
 # ==========================================
-# 3. EXPANDED EXAM & MOCK PRACTICE DATABASE
+# 3. EXPANDED EXAM & DYNAMIC MOCK PRACTICE DATABASE
 # ==========================================
 EXAMS_DATA = {
     "SSC CGL": {
@@ -263,7 +264,9 @@ EXAMS_DATA = {
         "mocks": [
             {"question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?", "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"], "answer": "Daman", "explanation": "Daman was declared the capital of the merged UT in 2020."},
             {"question": "Simple interest on $1,000 for 2 years at 5% per annum is:", "options": ["$100", "$50", "$150", "$200"], "answer": "$100", "explanation": "SI = (P * R * T)/100 = (1000 * 5 * 2)/100 = $100."},
-            {"question": "Which gas is used in fire extinguishers?", "options": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"], "answer": "Carbon Dioxide", "explanation": "CO2 displaces oxygen around fire to extinguish it."}
+            {"question": "Which gas is used in fire extinguishers?", "options": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"], "answer": "Carbon Dioxide", "explanation": "CO2 displaces oxygen around fire to extinguish it."},
+            {"question": "Choose the correct synonym for 'BENEVOLENT':", "options": ["Kind", "Cruel", "Selfish", "Greedy"], "answer": "Kind", "explanation": "Benevolent means well-meaning and kindly."},
+            {"question": "If A:B = 2:3 and B:C = 4:5, find A:B:C.", "options": ["8:12:15", "2:3:5", "4:6:10", "8:10:15"], "answer": "8:12:15", "explanation": "A:B = 8:12, B:C = 12:15, so A:B:C = 8:12:15."}
         ]
     },
     "SSC GD": {
@@ -284,7 +287,10 @@ EXAMS_DATA = {
         ],
         "mocks": [
             {"question": "Which dance form originates from the state of Assam?", "options": ["Bihu", "Kathak", "Garba", "Ghoomar"], "answer": "Bihu", "explanation": "Bihu is the folk dance of Assam associated with the Bihu festival."},
-            {"question": "Complete the series: 2, 4, 8, 16, ?", "options": ["32", "24", "64", "20"], "answer": "32", "explanation": "Each number is multiplied by 2. 16 * 2 = 32."}
+            {"question": "Complete the series: 2, 4, 8, 16, ?", "options": ["32", "24", "64", "20"], "answer": "32", "explanation": "Each number is multiplied by 2. 16 * 2 = 32."},
+            {"question": "What is the minimum age to become the Prime Minister of India?", "options": ["25 years", "30 years", "35 years", "18 years"], "answer": "25 years", "explanation": "A person must be at least 25 years old if they are a member of the Lok Sabha."},
+            {"question": "Which metal is the best conductor of electricity?", "options": ["Silver", "Copper", "Aluminum", "Gold"], "answer": "Silver", "explanation": "Silver has the highest electrical conductivity of all metals."},
+            {"question": "Find the average of first five prime numbers.", "options": ["5.6", "5.2", "6.2", "4.8"], "answer": "5.6", "explanation": "First 5 prime numbers are 2, 3, 5, 7, 11. Sum = 28. Average = 28 / 5 = 5.6."}
         ]
     },
     "SSC JE": {
@@ -304,7 +310,11 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC JE Paper-1 (CBT) Official Question Paper", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
         "mocks": [
-            {"question": "What is the SI unit of pressure?", "options": ["Pascal", "Joule", "Newton", "Watt"], "answer": "Pascal", "explanation": "Pascal (Pa) equals one newton per square meter."}
+            {"question": "What is the SI unit of pressure?", "options": ["Pascal", "Joule", "Newton", "Watt"], "answer": "Pascal", "explanation": "Pascal (Pa) equals one newton per square meter."},
+            {"question": "The ratio of stress to strain within the elastic limit is called:", "options": ["Young's Modulus", "Bulk Modulus", "Modulus of Rigidity", "Poisson's Ratio"], "answer": "Young's Modulus", "explanation": "Young's Modulus defines the mechanical property of linear elastic solid materials."},
+            {"question": "Which instrument is used to measure electric current?", "options": ["Ammeter", "Voltmeter", "Galvanometer", "Wattmeter"], "answer": "Ammeter", "explanation": "An ammeter measures electric current in amperes."},
+            {"question": "Bernoulli's principle is based on the conservation of:", "options": ["Energy", "Mass", "Momentum", "Pressure"], "answer": "Energy", "explanation": "Bernoulli's principle is derived from the law of conservation of energy."},
+            {"question": "Which type of cement is recommended for underwater construction?", "options": ["Quick Setting Cement", "Ordinary Portland Cement", "Low Heat Cement", "Rapid Hardening Cement"], "answer": "Quick Setting Cement", "explanation": "Quick Setting Cement sets rapidly under water."}
         ]
     },
     "SSC MTS": {
@@ -324,7 +334,11 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC MTS All Shift Question Papers", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
         "mocks": [
-            {"question": "Who was the first Governor-General of Independent India?", "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], "answer": "Lord Mountbatten", "explanation": "Lord Mountbatten was the first Governor-General of independent India."}
+            {"question": "Who was the first Governor-General of Independent India?", "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], "answer": "Lord Mountbatten", "explanation": "Lord Mountbatten was the first Governor-General of independent India."},
+            {"question": "Which planet is known as the 'Red Planet'?", "options": ["Mars", "Venus", "Jupiter", "Saturn"], "answer": "Mars", "explanation": "Mars appears red due to iron oxide (rust) on its surface."},
+            {"question": "Find the perimeter of a square with side 12 cm.", "options": ["48 cm", "24 cm", "144 cm", "36 cm"], "answer": "48 cm", "explanation": "Perimeter of square = 4 * side = 4 * 12 = 48 cm."},
+            {"question": "Fill in the blank: She has been working here _____ 2020.", "options": ["since", "for", "from", "in"], "answer": "since", "explanation": "We use 'since' for a specific point in time in perfect tenses."},
+            {"question": "Where is the Kaziranga National Park located?", "options": ["Assam", "Madhya Pradesh", "Uttarakhand", "Kerala"], "answer": "Assam", "explanation": "Kaziranga National Park in Assam is famous for its one-horned rhinoceroses."}
         ]
     },
     "UPSC CSE": {
@@ -345,7 +359,10 @@ EXAMS_DATA = {
         ],
         "mocks": [
             {"question": "Which Schedule of the Indian Constitution contains the anti-defection law?", "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"], "answer": "10th Schedule", "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."},
-            {"question": "Which river is known as the 'Sorrow of Bengal'?", "options": ["Damodar River", "Hooghly River", "Kosi River", "Brahmaputra River"], "answer": "Damodar River", "explanation": "Damodar River was historically known as the Sorrow of Bengal due to ravaging floods."}
+            {"question": "Which river is known as the 'Sorrow of Bengal'?", "options": ["Damodar River", "Hooghly River", "Kosi River", "Brahmaputra River"], "answer": "Damodar River", "explanation": "Damodar River was historically known as the Sorrow of Bengal due to ravaging floods."},
+            {"question": "The concept of 'Basic Structure' of the Constitution was propounded in which case?", "options": ["Kesavananda Bharati Case", "Golaknath Case", "Minerva Mills Case", "Maneka Gandhi Case"], "answer": "Kesavananda Bharati Case", "explanation": "The Supreme Court outlined the Basic Structure doctrine in the Kesavananda Bharati case (1973)."},
+            {"question": "Which body formulates the Monetary Policy in India?", "options": ["Monetary Policy Committee (RBI)", "Ministry of Finance", "NITI Aayog", "SEBI"], "answer": "Monetary Policy Committee (RBI)", "explanation": "The MPC of the Reserve Bank of India fixes benchmark interest rates in India."},
+            {"question": "Where is the headquarters of the International Court of Justice (ICJ)?", "options": ["The Hague, Netherlands", "Geneva, Switzerland", "New York, USA", "Vienna, Austria"], "answer": "The Hague, Netherlands", "explanation": "The ICJ is headquartered at the Peace Palace in The Hague, Netherlands."}
         ]
     },
     "NEET UG": {
@@ -366,7 +383,10 @@ EXAMS_DATA = {
         ],
         "mocks": [
             {"question": "Which organelle is known as the powerhouse of the cell?", "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"], "answer": "Mitochondria", "explanation": "Mitochondria generate ATP."},
-            {"question": "What is the pH of human blood under normal physiological conditions?", "options": ["7.35 - 7.45", "6.0 - 6.5", "8.0 - 8.5", "5.5 - 6.0"], "answer": "7.35 - 7.45", "explanation": "Human blood pH is strictly regulated between 7.35 and 7.45."}
+            {"question": "What is the pH of human blood under normal physiological conditions?", "options": ["7.35 - 7.45", "6.0 - 6.5", "8.0 - 8.5", "5.5 - 6.0"], "answer": "7.35 - 7.45", "explanation": "Human blood pH is strictly regulated between 7.35 and 7.45."},
+            {"question": "Which vitamin is water-soluble?", "options": ["Vitamin C", "Vitamin A", "Vitamin D", "Vitamin K"], "answer": "Vitamin C", "explanation": "Vitamins B and C are water-soluble, whereas A, D, E, and K are fat-soluble."},
+            {"question": "The functional unit of human kidney is:", "options": ["Nephron", "Neuron", "Alveoli", "Glomerulus"], "answer": "Nephron", "explanation": "Nephron is the microscopic structural and functional unit of the kidney."},
+            {"question": "Which hormone is known as the emergency hormone?", "options": ["Adrenaline", "Insulin", "Thyroxine", "Estrogen"], "answer": "Adrenaline", "explanation": "Adrenaline is released by adrenal glands during fight-or-flight conditions."}
         ]
     },
     "JEE Main & Advanced": {
@@ -386,7 +406,11 @@ EXAMS_DATA = {
             {"year": "2024", "title": "JEE Main Session 1 & Session 2 All Papers", "link": "https://nta.ac.in/Downloads", "format": "Official PDF Archive"}
         ],
         "mocks": [
-            {"question": "What is the derivative of sin(x^2) with respect to x?", "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"], "answer": "2x * cos(x^2)", "explanation": "Applies the chain rule derivative: d/dx[sin(u)] = cos(u) * du/dx."}
+            {"question": "What is the derivative of sin(x^2) with respect to x?", "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"], "answer": "2x * cos(x^2)", "explanation": "Applies the chain rule derivative: d/dx[sin(u)] = cos(u) * du/dx."},
+            {"question": "What is the hybridisation of carbon in benzene?", "options": ["sp2", "sp3", "sp", "sp3d"], "answer": "sp2", "explanation": "Each carbon atom in benzene is sp2 hybridised forming planar hexagonal rings."},
+            {"question": "An ideal gas expands isothermally. What is the change in its internal energy?", "options": ["Zero", "Positive", "Negative", "Infinite"], "answer": "Zero", "explanation": "Internal energy of an ideal gas depends only on temperature. Since temperature is constant in an isothermal process, delta U = 0."},
+            {"question": "The speed of light in a medium with refractive index 1.5 is:", "options": ["2 x 10^8 m/s", "3 x 10^8 m/s", "1.5 x 10^8 m/s", "2.5 x 10^8 m/s"], "answer": "2 x 10^8 m/s", "explanation": "v = c / n = (3 x 10^8) / 1.5 = 2 x 10^8 m/s."},
+            {"question": "Find the value of integral integral(0 to pi/2) sin(x) dx.", "options": ["1", "0", "2", "pi/2"], "answer": "1", "explanation": "Integral of sin(x) is -cos(x). Evaluated from 0 to pi/2: -cos(pi/2) - (-cos(0)) = 0 + 1 = 1."}
         ]
     }
 }
@@ -611,48 +635,56 @@ with tab_pyqs:
         """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 5: MOCK TEST ENGINE (WITH DYNAMIC MCQ COUNT)
+# TAB 5: MOCK TEST ENGINE (DYNAMIC COURSE QUESTIONS)
 # ------------------------------------------
 with tab_mocks:
     st.subheader(f"⚡ Practice Mock Test - {selected_exam_name}")
-    st.info(f"Showing **{num_mcqs}** MCQ(s) as requested in sidebar settings.")
-
-    base_questions = exam_info["mocks"]
     
-    # Expand or pad questions dynamically to meet requested num_mcqs
-    questions_to_show = []
-    while len(questions_to_show) < num_mcqs:
-        questions_to_show.extend(base_questions)
-    questions_to_show = questions_to_show[:num_mcqs]
+    # Fetch questions specifically mapped to the current selected exam course
+    course_questions = exam_info.get("mocks", [])
 
-    with st.form("mock_test_form"):
-        user_answers = {}
-        for idx, q in enumerate(questions_to_show):
-            st.markdown(f"**Q{idx+1}: {q['question']}**")
-            user_answers[idx] = st.radio(
-                f"Select option for Question {idx+1}", 
-                q["options"], 
-                key=f"q_{idx}",
-                label_visibility="collapsed"
-            )
-            st.markdown("---")
-            
-        submitted = st.form_submit_button("📝 Submit Answers")
+    if not course_questions:
+        st.warning("No questions available for this course yet.")
+    else:
+        # Dynamically sample or cycle questions based on selected num_mcqs
+        questions_to_show = []
+        while len(questions_to_show) < num_mcqs:
+            questions_to_show.extend(course_questions)
+        questions_to_show = questions_to_show[:num_mcqs]
 
-    if submitted:
-        score = 0
-        st.markdown("### 📊 Test Results & Analysis")
-        for idx, q in enumerate(questions_to_show):
-            ans = user_answers[idx]
-            if ans == q["answer"]:
-                score += 1
-                st.success(f"**Q{idx+1}: Correct!** Choice: `{ans}`")
-            else:
-                st.error(f"**Q{idx+1}: Incorrect.** Your Choice: `{ans}` | Correct Answer: `{q['answer']}`")
-            st.caption(f"💡 **Explanation:** {q['explanation']}")
-            
-        st.balloons()
-        st.metric("Final Score", f"{score} / {num_mcqs}", f"{(score/num_mcqs)*100:.1f}%")
+        st.info(f"Loaded **{len(questions_to_show)}** questions tailored specifically for **{selected_exam_name}**.")
+
+        # Create unique key per exam and MCQ count so state resets automatically on course switch
+        form_key = f"mock_form_{selected_exam_name}_{num_mcqs}"
+
+        with st.form(key=form_key):
+            user_answers = {}
+            for idx, q in enumerate(questions_to_show):
+                st.markdown(f"**Q{idx+1}: {q['question']}**")
+                user_answers[idx] = st.radio(
+                    f"Select option for Question {idx+1}", 
+                    q["options"], 
+                    key=f"q_{selected_exam_name}_{idx}",
+                    label_visibility="collapsed"
+                )
+                st.markdown("---")
+                
+            submitted = st.form_submit_button("📝 Submit Answers")
+
+        if submitted:
+            score = 0
+            st.markdown(f"### 📊 Test Results & Analysis for {selected_exam_name}")
+            for idx, q in enumerate(questions_to_show):
+                ans = user_answers[idx]
+                if ans == q["answer"]:
+                    score += 1
+                    st.success(f"**Q{idx+1}: Correct!** Choice: `{ans}`")
+                else:
+                    st.error(f"**Q{idx+1}: Incorrect.** Your Choice: `{ans}` | Correct Answer: `{q['answer']}`")
+                st.caption(f"💡 **Explanation:** {q['explanation']}")
+                
+            st.balloons()
+            st.metric("Final Score", f"{score} / {num_mcqs}", f"{(score/num_mcqs)*100:.1f}%")
 
 # ------------------------------------------
 # TAB 6: DOUBT CHATBOX & VOICE ASSISTANT
