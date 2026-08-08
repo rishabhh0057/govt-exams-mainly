@@ -635,56 +635,76 @@ with tab_pyqs:
         """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 5: MOCK TEST ENGINE (DYNAMIC COURSE QUESTIONS)
+# TAB 5: MOCK TEST ENGINE (INTERACTIVE USER SELECTION)
 # ------------------------------------------
 with tab_mocks:
     st.subheader(f"⚡ Practice Mock Test - {selected_exam_name}")
     
-    # Fetch questions specifically mapped to the current selected exam course
+    # Fetch questions mapped to the current selected exam course
     course_questions = exam_info.get("mocks", [])
 
     if not course_questions:
-        st.warning("No questions available for this course yet.")
+        st.warning("No mock questions available for this course yet.")
     else:
-        # Dynamically sample or cycle questions based on selected num_mcqs
-        questions_to_show = []
-        while len(questions_to_show) < num_mcqs:
-            questions_to_show.extend(course_questions)
-        questions_to_show = questions_to_show[:num_mcqs]
+        # Dynamically fit questions based on sidebar slider (num_mcqs)
+        questions_to_show = course_questions[:num_mcqs] if num_mcqs <= len(course_questions) else course_questions
 
-        st.info(f"Loaded **{len(questions_to_show)}** questions tailored specifically for **{selected_exam_name}**.")
+        st.info(f"📋 **{len(questions_to_show)}** questions loaded for **{selected_exam_name}**. Select your answers below:")
 
-        # Create unique key per exam and MCQ count so state resets automatically on course switch
+        # Form with interactive radio buttons for user selection
         form_key = f"mock_form_{selected_exam_name}_{num_mcqs}"
 
         with st.form(key=form_key):
-            user_answers = {}
+            user_selections = {}
+            
             for idx, q in enumerate(questions_to_show):
-                st.markdown(f"**Q{idx+1}: {q['question']}**")
-                user_answers[idx] = st.radio(
-                    f"Select option for Question {idx+1}", 
-                    q["options"], 
-                    key=f"q_{selected_exam_name}_{idx}",
-                    label_visibility="collapsed"
+                st.markdown(f"#### **Q{idx+1}: {q['question']}**")
+                
+                # Interactive Radio Button Component
+                user_selections[idx] = st.radio(
+                    label=f"Choose option for Q{idx+1}",
+                    options=q["options"],
+                    index=None,  # Leave unselected initially
+                    key=f"user_choice_{selected_exam_name}_{idx}"
                 )
                 st.markdown("---")
                 
-            submitted = st.form_submit_button("📝 Submit Answers")
+            submit_btn = st.form_submit_button("📩 Submit My Answers", use_container_width=True)
 
-        if submitted:
+        # Evaluation & Results Display
+        if submit_btn:
             score = 0
-            st.markdown(f"### 📊 Test Results & Analysis for {selected_exam_name}")
+            unanswered = 0
+            
+            st.markdown(f"### 📊 Results Breakdown for {selected_exam_name}")
+            
             for idx, q in enumerate(questions_to_show):
-                ans = user_answers[idx]
-                if ans == q["answer"]:
-                    score += 1
-                    st.success(f"**Q{idx+1}: Correct!** Choice: `{ans}`")
-                else:
-                    st.error(f"**Q{idx+1}: Incorrect.** Your Choice: `{ans}` | Correct Answer: `{q['answer']}`")
-                st.caption(f"💡 **Explanation:** {q['explanation']}")
+                user_choice = user_selections[idx]
+                correct_ans = q["answer"]
                 
-            st.balloons()
-            st.metric("Final Score", f"{score} / {num_mcqs}", f"{(score/num_mcqs)*100:.1f}%")
+                if user_choice is None:
+                    unanswered += 1
+                    st.warning(f"**Q{idx+1}: Unanswered** | Correct Answer: **{correct_ans}**")
+                elif user_choice == correct_ans:
+                    score += 1
+                    st.success(f"**Q{idx+1}: Correct!** You selected **{user_choice}**")
+                else:
+                    st.error(f"**Q{idx+1}: Incorrect.** You selected **{user_choice}** | Correct Answer: **{correct_ans}**")
+                
+                st.caption(f"💡 **Explanation:** {q['explanation']}")
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+            # Score Overview
+            total_qs = len(questions_to_show)
+            pct = (score / total_qs) * 100 if total_qs > 0 else 0
+            
+            col_s1, col_s2, col_s3 = st.columns(3)
+            col_s1.metric("Total Score", f"{score} / {total_qs}")
+            col_s2.metric("Accuracy", f"{pct:.1f}%")
+            col_s3.metric("Skipped", unanswered)
+
+            if pct >= 80:
+                st.balloons()
 
 # ------------------------------------------
 # TAB 6: DOUBT CHATBOX & VOICE ASSISTANT
