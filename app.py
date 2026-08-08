@@ -4,7 +4,15 @@ import urllib.parse
 import streamlit as st
 from docx import Document
 from pptx import Presentation
-from gtts import gTTS
+
+# ==========================================
+# SAFE IMPORTS & FALLBACKS
+# ==========================================
+try:
+    from gtts import gTTS
+    HAS_GTTS = True
+except ImportError:
+    HAS_GTTS = False
 
 # ==========================================
 # 1. PAGE CONFIGURATION & MODERN STYLING
@@ -130,7 +138,7 @@ st.markdown("""
 
 
 # ==========================================
-# 2. DOCX & PPTX EXPORT GENERATORS
+# 2. DOCX, PPTX & AUDIO EXPORT GENERATORS
 # ==========================================
 def create_docx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     doc = Document()
@@ -191,7 +199,9 @@ def create_pptx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     return bio
 
 def text_to_speech(text):
-    """Generates audio bytes from text using gTTS."""
+    """Generates audio bytes from text using gTTS if installed."""
+    if not HAS_GTTS:
+        return None
     tts = gTTS(text=text, lang='en')
     fp = io.BytesIO()
     tts.write_to_fp(fp)
@@ -707,10 +717,12 @@ with tab_chat:
                 st.write(reply)
                 
                 # Audio response synthesis (Voice Output)
-                try:
-                    audio_fp = text_to_speech(reply[:250])  # Convert first 250 chars to speech
-                    st.audio(audio_fp, format="audio/mp3")
-                except Exception as audio_err:
-                    st.caption("🔊 Voice response generation skipped.")
+                if HAS_GTTS:
+                    try:
+                        audio_fp = text_to_speech(reply[:250])  # Convert first 250 chars to speech
+                        if audio_fp:
+                            st.audio(audio_fp, format="audio/mp3")
+                    except Exception as audio_err:
+                        st.caption("🔊 Voice response generation skipped.")
 
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
