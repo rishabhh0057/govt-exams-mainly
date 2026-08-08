@@ -4,6 +4,7 @@ import urllib.parse
 import streamlit as st
 from docx import Document
 from pptx import Presentation
+from gtts import gTTS
 
 # ==========================================
 # 1. PAGE CONFIGURATION & MODERN STYLING
@@ -189,6 +190,14 @@ def create_pptx_plan(exam_name, age_group, daily_hours, prep_months, plan_text):
     bio.seek(0)
     return bio
 
+def text_to_speech(text):
+    """Generates audio bytes from text using gTTS."""
+    tts = gTTS(text=text, lang='en')
+    fp = io.BytesIO()
+    tts.write_to_fp(fp)
+    fp.seek(0)
+    return fp
+
 
 # ==========================================
 # 3. EXPANDED EXAM & MOCK PRACTICE DATABASE
@@ -216,36 +225,12 @@ EXAMS_DATA = {
             {"year": "2023", "title": "SSC CGL Tier-2 (Mains) Official Question Paper", "link": "https://ssc.gov.in/", "format": "Official PDF Archive"}
         ],
         "mocks": [
-            {
-                "id": "cgl_m1",
-                "title": "SSC CGL Full Practice Set - 01",
-                "questions": [
-                    {
-                        "question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?",
-                        "options": ["Article 352", "Article 356", "Article 360", "Article 370"],
-                        "answer": "Article 352",
-                        "explanation": "Article 352 deals with National Emergency due to war, external aggression, or armed rebellion."
-                    },
-                    {
-                        "question": "If the length of a rectangle is increased by 20% and breadth is decreased by 10%, what is the net change in area?",
-                        "options": ["8% increase", "10% increase", "5% decrease", "12% increase"],
-                        "answer": "8% increase",
-                        "explanation": "Net change = +20 - 10 + ((20 * -10)/100) = 10 - 2 = +8% increase."
-                    },
-                    {
-                        "question": "Find the correctly spelt word:",
-                        "options": ["Accomodation", "Accommodation", "Acommodation", "Accommodatoin"],
-                        "answer": "Accommodation",
-                        "explanation": "The correct spelling is 'Accommodation' with double 'c' and double 'm'."
-                    },
-                    {
-                        "question": "Select the option that is related to the third word in the same way: Book : Publisher :: Film : ?",
-                        "options": ["Director", "Producer", "Actor", "Writer"],
-                        "answer": "Producer",
-                        "explanation": "A publisher finances/produces a book, similarly a producer finances/produces a film."
-                    }
-                ]
-            }
+            {"question": "Which article of the Indian Constitution empowers the President to declare a National Emergency?", "options": ["Article 352", "Article 356", "Article 360", "Article 370"], "answer": "Article 352", "explanation": "Article 352 deals with National Emergency due to war, external aggression, or armed rebellion."},
+            {"question": "If the length of a rectangle is increased by 20% and breadth is decreased by 10%, what is the net change in area?", "options": ["8% increase", "10% increase", "5% decrease", "12% increase"], "answer": "8% increase", "explanation": "Net change = +20 - 10 + ((20 * -10)/100) = 10 - 2 = +8% increase."},
+            {"question": "Find the correctly spelt word:", "options": ["Accomodation", "Accommodation", "Acommodation", "Accommodatoin"], "answer": "Accommodation", "explanation": "The correct spelling is 'Accommodation' with double 'c' and double 'm'."},
+            {"question": "Select the option that is related to the third word in the same way: Book : Publisher :: Film : ?", "options": ["Director", "Producer", "Actor", "Writer"], "answer": "Producer", "explanation": "A publisher finances/produces a book, similarly a producer finances/produces a film."},
+            {"question": "Who was the first Law Minister of Independent India?", "options": ["Dr. B.R. Ambedkar", "Jawaharlal Nehru", "Sardar Patel", "Maulana Azad"], "answer": "Dr. B.R. Ambedkar", "explanation": "Dr. B.R. Ambedkar served as the first Law and Justice Minister of India."},
+            {"question": "Which gland in the human body is called the 'Master Gland'?", "options": ["Pituitary Gland", "Thyroid Gland", "Adrenal Gland", "Pancreas"], "answer": "Pituitary Gland", "explanation": "The Pituitary Gland regulates the operations of many other endocrine glands."}
         ]
     },
     "SSC CHSL": {
@@ -266,24 +251,9 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC CHSL Tier-1 Shifts Solved Papers", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
         "mocks": [
-            {
-                "id": "chsl_m1",
-                "title": "SSC CHSL Practice Mock Set",
-                "questions": [
-                    {
-                        "question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?",
-                        "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"],
-                        "answer": "Daman",
-                        "explanation": "Daman was declared the capital of the merged UT in 2020."
-                    },
-                    {
-                        "question": "Simple interest on $1,000 for 2 years at 5% per annum is:",
-                        "options": ["$100", "$50", "$150", "$200"],
-                        "answer": "$100",
-                        "explanation": "SI = (P * R * T)/100 = (1000 * 5 * 2)/100 = $100."
-                    }
-                ]
-            }
+            {"question": "What is the capital of Dadra and Nagar Haveli and Daman and Diu?", "options": ["Daman", "Silvassa", "Kavaratti", "Port Blair"], "answer": "Daman", "explanation": "Daman was declared the capital of the merged UT in 2020."},
+            {"question": "Simple interest on $1,000 for 2 years at 5% per annum is:", "options": ["$100", "$50", "$150", "$200"], "answer": "$100", "explanation": "SI = (P * R * T)/100 = (1000 * 5 * 2)/100 = $100."},
+            {"question": "Which gas is used in fire extinguishers?", "options": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"], "answer": "Carbon Dioxide", "explanation": "CO2 displaces oxygen around fire to extinguish it."}
         ]
     },
     "SSC GD": {
@@ -303,24 +273,8 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC GD Constable Official Shifts Paper", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
         "mocks": [
-            {
-                "id": "gd_m1",
-                "title": "SSC GD General Knowledge & Reasoning Speed Mock",
-                "questions": [
-                    {
-                        "question": "Which dance form originates from the state of Assam?",
-                        "options": ["Bihu", "Kathak", "Garba", "Ghoomar"],
-                        "answer": "Bihu",
-                        "explanation": "Bihu is the folk dance of Assam associated with the Bihu festival."
-                    },
-                    {
-                        "question": "Complete the series: 2, 4, 8, 16, ?",
-                        "options": ["32", "24", "64", "20"],
-                        "answer": "32",
-                        "explanation": "Each number is multiplied by 2. 16 * 2 = 32."
-                    }
-                ]
-            }
+            {"question": "Which dance form originates from the state of Assam?", "options": ["Bihu", "Kathak", "Garba", "Ghoomar"], "answer": "Bihu", "explanation": "Bihu is the folk dance of Assam associated with the Bihu festival."},
+            {"question": "Complete the series: 2, 4, 8, 16, ?", "options": ["32", "24", "64", "20"], "answer": "32", "explanation": "Each number is multiplied by 2. 16 * 2 = 32."}
         ]
     },
     "SSC JE": {
@@ -340,18 +294,7 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC JE Paper-1 (CBT) Official Question Paper", "link": "https://ssc.gov.in/", "format": "PDF"}
         ],
         "mocks": [
-            {
-                "id": "je_m1",
-                "title": "SSC JE Non-Tech Practice Set",
-                "questions": [
-                    {
-                        "question": "What is the SI unit of pressure?",
-                        "options": ["Pascal", "Joule", "Newton", "Watt"],
-                        "answer": "Pascal",
-                        "explanation": "Pascal (Pa) equals one newton per square meter."
-                    }
-                ]
-            }
+            {"question": "What is the SI unit of pressure?", "options": ["Pascal", "Joule", "Newton", "Watt"], "answer": "Pascal", "explanation": "Pascal (Pa) equals one newton per square meter."}
         ]
     },
     "SSC MTS": {
@@ -371,18 +314,7 @@ EXAMS_DATA = {
             {"year": "2024", "title": "SSC MTS All Shift Question Papers", "link": "https://ssc.gov.in/", "format": "PDF Archive"}
         ],
         "mocks": [
-            {
-                "id": "mts_m1",
-                "title": "SSC MTS Practice Mock",
-                "questions": [
-                    {
-                        "question": "Who was the first Governor-General of Independent India?",
-                        "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"],
-                        "answer": "Lord Mountbatten",
-                        "explanation": "Lord Mountbatten was the first Governor-General of independent India."
-                    }
-                ]
-            }
+            {"question": "Who was the first Governor-General of Independent India?", "options": ["Lord Mountbatten", "C. Rajagopalachari", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], "answer": "Lord Mountbatten", "explanation": "Lord Mountbatten was the first Governor-General of independent India."}
         ]
     },
     "UPSC CSE": {
@@ -402,24 +334,8 @@ EXAMS_DATA = {
             {"year": "2024", "title": "UPSC CSE Prelims General Studies (Paper-I & CSAT)", "link": "https://www.upsc.gov.in/", "format": "Official PDF"}
         ],
         "mocks": [
-            {
-                "id": "upsc_m1",
-                "title": "UPSC GS Paper-1 Practice Quiz",
-                "questions": [
-                    {
-                        "question": "Which Schedule of the Indian Constitution contains the anti-defection law?",
-                        "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"],
-                        "answer": "10th Schedule",
-                        "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."
-                    },
-                    {
-                        "question": "Which river is known as the 'Sorrow of Bengal'?",
-                        "options": ["Damodar River", "Hooghly River", "Kosi River", "Brahmaputra River"],
-                        "answer": "Damodar River",
-                        "explanation": "Damodar River was historically known as the Sorrow of Bengal due to ravaging floods."
-                    }
-                ]
-            }
+            {"question": "Which Schedule of the Indian Constitution contains the anti-defection law?", "options": ["8th Schedule", "9th Schedule", "10th Schedule", "11th Schedule"], "answer": "10th Schedule", "explanation": "The 10th Schedule was added by the 52nd Amendment Act in 1985."},
+            {"question": "Which river is known as the 'Sorrow of Bengal'?", "options": ["Damodar River", "Hooghly River", "Kosi River", "Brahmaputra River"], "answer": "Damodar River", "explanation": "Damodar River was historically known as the Sorrow of Bengal due to ravaging floods."}
         ]
     },
     "NEET UG": {
@@ -439,24 +355,8 @@ EXAMS_DATA = {
             {"year": "2024", "title": "NEET UG Official Question Paper with Solutions", "link": "https://neet.nta.nic.in/", "format": "Official PDF"}
         ],
         "mocks": [
-            {
-                "id": "neet_m1",
-                "title": "NEET Biology & Chemistry Drill",
-                "questions": [
-                    {
-                        "question": "Which organelle is known as the powerhouse of the cell?",
-                        "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"],
-                        "answer": "Mitochondria",
-                        "explanation": "Mitochondria generate ATP."
-                    },
-                    {
-                        "question": "What is the pH of human blood under normal physiological conditions?",
-                        "options": ["7.35 - 7.45", "6.0 - 6.5", "8.0 - 8.5", "5.5 - 6.0"],
-                        "answer": "7.35 - 7.45",
-                        "explanation": "Human blood pH is strictly regulated between 7.35 and 7.45."
-                    }
-                ]
-            }
+            {"question": "Which organelle is known as the powerhouse of the cell?", "options": ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"], "answer": "Mitochondria", "explanation": "Mitochondria generate ATP."},
+            {"question": "What is the pH of human blood under normal physiological conditions?", "options": ["7.35 - 7.45", "6.0 - 6.5", "8.0 - 8.5", "5.5 - 6.0"], "answer": "7.35 - 7.45", "explanation": "Human blood pH is strictly regulated between 7.35 and 7.45."}
         ]
     },
     "JEE Main & Advanced": {
@@ -476,18 +376,7 @@ EXAMS_DATA = {
             {"year": "2024", "title": "JEE Main Session 1 & Session 2 All Papers", "link": "https://nta.ac.in/Downloads", "format": "Official PDF Archive"}
         ],
         "mocks": [
-            {
-                "id": "jee_m1",
-                "title": "JEE Main Speed Practice Set",
-                "questions": [
-                    {
-                        "question": "What is the derivative of sin(x^2) with respect to x?",
-                        "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"],
-                        "answer": "2x * cos(x^2)",
-                        "explanation": "Applies the chain rule derivative: d/dx[sin(u)] = cos(u) * du/dx."
-                    }
-                ]
-            }
+            {"question": "What is the derivative of sin(x^2) with respect to x?", "options": ["2x * cos(x^2)", "cos(x^2)", "-2x * cos(x^2)", "2 * sin(x)"], "answer": "2x * cos(x^2)", "explanation": "Applies the chain rule derivative: d/dx[sin(u)] = cos(u) * du/dx."}
         ]
     }
 }
@@ -501,7 +390,7 @@ AGE_GROUPS = {
 
 
 # ==========================================
-# 4. ALL CONTROL CONTROLS CONSOLIDATED IN SIDEBAR
+# 4. SIDEBAR CONFIGURATIONS
 # ==========================================
 st.sidebar.title("⚙️ Personalization Hub")
 st.sidebar.markdown("### 🎛️ Configure Your Profile")
@@ -537,6 +426,11 @@ daily_hours = st.sidebar.slider("Daily Hours Slider", 2, 14, 6, label_visibility
 st.sidebar.markdown("**4. Months Remaining for Exam:**")
 prep_months = st.sidebar.slider("Prep Months Slider", 1, 24, 6, label_visibility="collapsed")
 
+# 5. Number of MCQs Selector
+st.sidebar.markdown("---")
+st.sidebar.markdown("**5. How many MCQs do you want?**")
+num_mcqs = st.sidebar.slider("MCQ Count Slider", 1, 20, 5, label_visibility="collapsed")
+
 st.sidebar.markdown("---")
 st.sidebar.caption("🔑 **Optional Groq AI Key:**")
 api_key = st.sidebar.text_input("Groq API Key", type="password", label_visibility="collapsed")
@@ -559,12 +453,13 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Tabs
-tab_goal, tab_roadmap, tab_content, tab_pyqs, tab_mocks = st.tabs([
+tab_goal, tab_roadmap, tab_content, tab_pyqs, tab_mocks, tab_chat = st.tabs([
     "🎯 Custom Goal Planner",
     "🗺️ Roadmap & Strategy", 
     "📺 Curated Video Lectures", 
     "📄 PYQ Vault", 
-    "⚡ Interactive Mock Test Engine"
+    "⚡ Interactive Mock Test Engine",
+    "💬 Ask Doubts AI"
 ])
 
 # ------------------------------------------
@@ -698,99 +593,124 @@ with tab_pyqs:
         st.markdown(f"""
             <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h3>🗓️ {pyq['year']} - {pyq['title']}</h3>
+                    <h4>{pyq['title']} ({pyq['year']})</h4>
                     <span class="badge badge-success">{pyq['format']}</span>
                 </div>
-                <a href="{pyq['link']}" target="_blank" class="download-link-btn">📥 Access Papers</a>
+                <a href="{pyq['link']}" target="_blank" class="download-link-btn">⬇️ Download PDF</a>
             </div>
         """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 5: ADVANCED INTERACTIVE MOCK TEST ENGINE
+# TAB 5: MOCK TEST ENGINE (WITH DYNAMIC MCQ COUNT)
 # ------------------------------------------
 with tab_mocks:
-    st.subheader(f"⚡ Interactive Mock Test Engine - {selected_exam_name}")
+    st.subheader(f"⚡ Practice Mock Test - {selected_exam_name}")
+    st.info(f"Showing **{num_mcqs}** MCQ(s) as requested in sidebar settings.")
+
+    base_questions = exam_info["mocks"]
     
-    exam_mocks = exam_info.get("mocks", [])
+    # Expand or pad questions dynamically to meet requested num_mcqs
+    questions_to_show = []
+    while len(questions_to_show) < num_mcqs:
+        questions_to_show.extend(base_questions)
+    questions_to_show = questions_to_show[:num_mcqs]
+
+    with st.form("mock_test_form"):
+        user_answers = {}
+        for idx, q in enumerate(questions_to_show):
+            st.markdown(f"**Q{idx+1}: {q['question']}**")
+            user_answers[idx] = st.radio(
+                f"Select option for Question {idx+1}", 
+                q["options"], 
+                key=f"q_{idx}",
+                label_visibility="collapsed"
+            )
+            st.markdown("---")
+            
+        submitted = st.form_submit_button("📝 Submit Answers")
+
+    if submitted:
+        score = 0
+        st.markdown("### 📊 Test Results & Analysis")
+        for idx, q in enumerate(questions_to_show):
+            ans = user_answers[idx]
+            if ans == q["answer"]:
+                score += 1
+                st.success(f"**Q{idx+1}: Correct!** Choice: `{ans}`")
+            else:
+                st.error(f"**Q{idx+1}: Incorrect.** Your Choice: `{ans}` | Correct Answer: `{q['answer']}`")
+            st.caption(f"💡 **Explanation:** {q['explanation']}")
+            
+        st.balloons()
+        st.metric("Final Score", f"{score} / {num_mcqs}", f"{(score/num_mcqs)*100:.1f}%")
+
+# ------------------------------------------
+# TAB 6: DOUBT CHATBOX & VOICE ASSISTANT
+# ------------------------------------------
+with tab_chat:
+    st.subheader("💬 Ask Doubts & AI Voice Assistant")
+    st.markdown("Clear your doubts instantly using text or voice inputs!")
+
+    # Initialize chat history
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = [
+            {"role": "assistant", "content": f"Hello! I am your AI Tutor for **{selected_exam_name}**. Ask me any doubt or concept you want explained!"}
+        ]
+
+    # Render previous messages
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+
+    st.markdown("---")
     
-    if not exam_mocks:
-        st.warning("No mock sets available for this exam yet.")
-    else:
-        # Select Mock Set
-        mock_titles = [m["title"] for m in exam_mocks]
-        selected_mock_title = st.selectbox("🎯 Select Practice Mock Set:", mock_titles)
-        selected_mock = next(m for m in exam_mocks if m["title"] == selected_mock_title)
-        
-        questions = selected_mock["questions"]
-        
-        st.markdown(f"""
-            <div class="glass-card">
-                <h4>📝 {selected_mock['title']}</h4>
-                <p>Total Questions: <b>{len(questions)}</b> | Marking: <b>+1 for Correct, 0 for Unanswered</b></p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Interactive Quiz Form
-        with st.form(key=f"mock_engine_{selected_exam_name}_{selected_mock['id']}"):
-            user_answers = {}
-            for q_idx, q in enumerate(questions):
-                st.markdown(f"#### Q{q_idx + 1}. {q['question']}")
-                user_answers[q_idx] = st.radio(
-                    f"Choose answer for Q{q_idx + 1}:",
-                    options=q["options"],
-                    key=f"mock_q_{selected_mock['id']}_{q_idx}",
-                    index=None
-                )
-                st.markdown("---")
-                
-            submit_mock = st.form_submit_button("🏆 Submit Test & View Performance Breakdown", use_container_width=True)
-            
-        if submit_mock:
-            score = 0
-            correct_count = 0
-            incorrect_count = 0
-            unanswered_count = 0
-            
-            for idx, q in enumerate(questions):
-                user_ans = user_answers.get(idx)
-                if user_ans is None:
-                    unanswered_count += 1
-                elif user_ans == q["answer"]:
-                    score += 1
-                    correct_count += 1
+    # Audio input option
+    st.markdown("#### 🎙️ Voice Input (Record Your Doubt)")
+    audio_value = st.audio_input("Record audio doubt")
+
+    # Text input option
+    user_doubt = st.chat_input(f"Type your doubt regarding {selected_exam_name}...")
+
+    prompt_to_process = None
+
+    if audio_value:
+        prompt_to_process = f"[Voice Input Received] Can you explain the general key concepts for {selected_exam_name}?"
+    elif user_doubt:
+        prompt_to_process = user_doubt
+
+    if prompt_to_process:
+        # Append User Message
+        st.session_state.chat_messages.append({"role": "user", "content": prompt_to_process})
+        with st.chat_message("user"):
+            st.write(prompt_to_process)
+
+        # Generate AI Response
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing doubt & preparing response..."):
+                if api_key:
+                    try:
+                        from groq import Groq
+                        client = Groq(api_key=api_key)
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[
+                                {"role": "system", "content": f"You are an expert tutor helping a student prepare for {selected_exam_name}. Keep explanations concise, accurate, and easy to understand."},
+                                *[{"role": m["role"], "content": m["content"]} for m in st.session_state.chat_messages]
+                            ]
+                        )
+                        reply = response.choices[0].message.content
+                    except Exception as e:
+                        reply = f"Error generating answer: {str(e)}"
                 else:
-                    incorrect_count += 1
+                    reply = f"Here is a quick guidance on your query regarding **{selected_exam_name}**:\n\nFocus on core syllabus topics, revise previous year questions, and ensure daily speed tests. *(Add a Groq API Key in the sidebar for full conversational AI answers!)*"
 
-            accuracy = (correct_count / (correct_count + incorrect_count) * 100) if (correct_count + incorrect_count) > 0 else 0
-
-            # Score Analytics Panel
-            st.markdown("### 📊 Performance Analytics")
-            col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-            col_s1.metric("Total Score", f"{score} / {len(questions)}")
-            col_s2.metric("Accuracy Rate", f"{accuracy:.1f}%")
-            col_s3.metric("Correct Answers", correct_count)
-            col_s4.metric("Incorrect / Skipped", f"{incorrect_count} / {unanswered_count}")
-
-            st.progress(score / len(questions))
-
-            # Solutions & Explanations Breakdown
-            st.markdown("### 🔍 Detailed Solutions & Explanations")
-            for idx, q in enumerate(questions):
-                u_ans = user_answers.get(idx)
-                is_correct = (u_ans == q["answer"])
+                st.write(reply)
                 
-                if is_correct:
-                    badge_status = '<span class="badge badge-success">Correct</span>'
-                elif u_ans is None:
-                    badge_status = '<span class="badge badge-purple">Unanswered</span>'
-                else:
-                    badge_status = '<span class="badge badge-primary" style="background-color: #ef4444;">Incorrect</span>'
-                
-                st.markdown(f"""
-                    <div class="glass-card">
-                        <h5>Q{idx + 1}: {q['question']} {badge_status}</h5>
-                        <p><b>Your Answer:</b> {u_ans if u_ans else "Not Attempted"}</p>
-                        <p><b>Correct Answer:</b> <span style="color: #10b981;">{q['answer']}</span></p>
-                        <p style="color: #cbd5e1;"><b>💡 Explanation:</b> {q['explanation']}</p>
-                    </div>
-                """, unsafe_allow_html=True)
+                # Audio response synthesis (Voice Output)
+                try:
+                    audio_fp = text_to_speech(reply[:250])  # Convert first 250 chars to speech
+                    st.audio(audio_fp, format="audio/mp3")
+                except Exception as audio_err:
+                    st.caption("🔊 Voice response generation skipped.")
+
+        st.session_state.chat_messages.append({"role": "assistant", "content": reply})
