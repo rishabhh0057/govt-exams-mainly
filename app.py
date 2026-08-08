@@ -541,13 +541,13 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours/day
         st.session_state['plan_months'] = prep_months
 
     if 'generated_plan' in st.session_state:
-        st.markdown("---")
-        st.markdown(f"### 📋 Personal Study Goal Plan for {st.session_state['plan_exam']}")
-        st.text_area("Your Generated Plan", st.session_state['generated_plan'], height=220)
-
-        st.markdown("### 📥 Download Plan File")
-        col_doc, col_ppt = st.columns(2)
-
+        st.markdown("### 📋 Your Customized Daily Execution Plan")
+        st.info(st.session_state['generated_plan'])
+        
+        st.markdown("#### 📥 Export & Audio Hub")
+        col_exp1, col_exp2, col_exp3 = st.columns(3)
+        
+        # Word Export
         docx_file = create_docx_plan(
             st.session_state['plan_exam'],
             st.session_state['plan_age'],
@@ -555,14 +555,15 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours/day
             st.session_state['plan_months'],
             st.session_state['generated_plan']
         )
-        col_doc.download_button(
-            label="📄 Download Word Doc (.docx)",
+        col_exp1.download_button(
+            "📄 Download Word (.docx)",
             data=docx_file,
-            file_name=f"{st.session_state['plan_exam']}_Goal_Plan.docx",
+            file_name=f"{selected_exam_name}_Goal_Plan.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             use_container_width=True
         )
 
+        # PowerPoint Export
         pptx_file = create_pptx_plan(
             st.session_state['plan_exam'],
             st.session_state['plan_age'],
@@ -570,211 +571,179 @@ Timeline: {prep_months} Months Out | Daily Schedule: {daily_hours} Hours/day
             st.session_state['plan_months'],
             st.session_state['generated_plan']
         )
-        col_ppt.download_button(
-            label="📊 Download PowerPoint (.pptx)",
+        col_exp2.download_button(
+            "📊 Download PPT (.pptx)",
             data=pptx_file,
-            file_name=f"{st.session_state['plan_exam']}_Goal_Plan.pptx",
+            file_name=f"{selected_exam_name}_Goal_Plan.pptx",
             mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
             use_container_width=True
         )
 
-        st.markdown("### 📲 Share Goal Plan")
-        share_text = f"My Study Goal Plan for {st.session_state['plan_exam']}:\n\n{st.session_state['generated_plan']}"
-        encoded_text = urllib.parse.quote(share_text)
-        
-        whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_text}"
-        email_url = f"mailto:?subject={urllib.parse.quote('My Study Goal Plan')}&body={encoded_text}"
+        # Text-to-Speech Export
+        if HAS_GTTS:
+            if col_exp3.button("🔊 Listen to Audio Plan", use_container_width=True):
+                audio_data = text_to_speech(st.session_state['generated_plan'])
+                if audio_data:
+                    st.audio(audio_data, format="audio/mp3")
+        else:
+            col_exp3.warning("Install `gTTS` (`pip install gTTS`) to enable voice playback.")
 
-        col_wa, col_em = st.columns(2)
-        col_wa.markdown(f'<a href="{whatsapp_url}" target="_blank" class="share-btn-wa">💬 Share via WhatsApp</a>', unsafe_allow_html=True)
-        col_em.markdown(f'<a href="{email_url}" target="_blank" class="share-btn-email">✉️ Share via Email</a>', unsafe_allow_html=True)
+        # Sharing Tools
+        st.markdown("#### 🔗 Quick Share Options")
+        share_msg = urllib.parse.quote(f"Check out my target study plan for {selected_exam_name}:\n\n" + st.session_state['generated_plan'][:300] + "...")
+        col_sh1, col_sh2 = st.columns(2)
+        col_sh1.markdown(f'<a href="https://wa.me/?text={share_msg}" target="_blank" class="share-btn-wa">📱 Share via WhatsApp</a>', unsafe_allow_html=True)
+        col_sh2.markdown(f'<a href="mailto:?subject=My Exam Goal Plan&body={share_msg}" target="_blank" class="share-btn-email">✉️ Share via Email</a>', unsafe_allow_html=True)
+
 
 # ------------------------------------------
-# TAB 2: ROADMAP
+# TAB 2: ROADMAP & STRATEGY
 # ------------------------------------------
 with tab_roadmap:
-    st.subheader(f"📌 Preparation Strategy - {selected_exam_name}")
-    for step in exam_info["roadmap"]:
-        st.markdown(f"<div class='roadmap-step'>{step}</div>", unsafe_allow_html=True)
-
-# ------------------------------------------
-# TAB 3: VIDEO LECTURES
-# ------------------------------------------
-with tab_content:
-    st.subheader(f"📺 Master Class Video Lectures - {selected_exam_name}")
-    cols = st.columns(2)
-    for idx, item in enumerate(exam_info["top_teachers"]):
-        col = cols[idx % 2]
-        with col:
-            st.markdown(f"""
-                <div class="glass-card">
-                    <h4>📖 {item['subject']}</h4>
-                    <p style="margin-bottom: 4px;">👨‍🏫 <b>Educator:</b> {item['teacher']}</p>
-                    <p style="margin-bottom: 4px;">📢 <b>Channel:</b> {item['channel']}</p>
-                    <p style="margin-bottom: 10px;">🎥 <b>Title:</b> {item['video_title']}</p>
-                    <a href="{item['youtube_link']}" target="_blank" class="yt-btn">▶️ Watch Playlist on YouTube</a>
-                </div>
-            """, unsafe_allow_html=True)
-
-# ------------------------------------------
-# TAB 4: PYQs
-# ------------------------------------------
-with tab_pyqs:
-    st.subheader(f"📄 Official PYQ Archive - {selected_exam_name}")
-    st.markdown(f'<a href="{exam_info["official_pyq_portal"]}" target="_blank" class="official-btn">🌐 Open Official Exam Portal</a>', unsafe_allow_html=True)
+    st.subheader(f"🗺️ Step-by-Step Preparation Strategy for {selected_exam_name}")
+    st.markdown(f"**Target Audience Strategy ({selected_age_group}):** {AGE_GROUPS[selected_age_group]}")
+    st.markdown("---")
     
-    for pyq in exam_info["pyqs"]:
+    for idx, step in enumerate(exam_info.get("roadmap", []), start=1):
         st.markdown(f"""
-            <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4>{pyq['title']} ({pyq['year']})</h4>
-                    <span class="badge badge-success">{pyq['format']}</span>
-                </div>
-                <a href="{pyq['link']}" target="_blank" class="download-link-btn">⬇️ Download PDF</a>
+            <div class="roadmap-step">
+                <h4>Phase {idx}</h4>
+                <p style="font-size: 15px; margin-bottom: 0;">{step}</p>
             </div>
         """, unsafe_allow_html=True)
 
+
 # ------------------------------------------
-# TAB 5: MOCK TEST ENGINE (INTERACTIVE USER SELECTION)
+# TAB 3: CURATED VIDEO LECTURES
+# ------------------------------------------
+with tab_content:
+    st.subheader(f"📺 Recommended Top YouTube Faculties for {selected_exam_name}")
+    st.markdown("Handpicked free courses and top video marathons available on YouTube:")
+    
+    teachers = exam_info.get("top_teachers", [])
+    if teachers:
+        for t in teachers:
+            col_t1, col_t2 = st.columns([3, 1])
+            with col_t1:
+                st.markdown(f"### 👨‍🏫 {t['teacher']} ({t['subject']})")
+                st.markdown(f"**Channel:** {t['channel']} | **Recommended:** {t['video_title']}")
+            with col_t2:
+                st.markdown(f'<a href="{t["youtube_link"]}" target="_blank" class="yt-btn">▶️ Watch on YouTube</a>', unsafe_allow_html=True)
+            st.markdown("---")
+    else:
+        st.info("No explicit faculties listed yet. Search YouTube for full playlist series.")
+
+
+# ------------------------------------------
+# TAB 4: PYQ VAULT
+# ------------------------------------------
+with tab_pyqs:
+    st.subheader(f"📄 Previous Year Question (PYQ) Papers")
+    st.markdown("Official paper repositories and previous year question paper links:")
+    
+    st.markdown(f'<a href="{exam_info["official_pyq_portal"]}" target="_blank" class="official-btn">🌐 Open Official Portal Archives</a>', unsafe_allow_html=True)
+    
+    pyqs = exam_info.get("pyqs", [])
+    for p in pyqs:
+        col_p1, col_p2 = st.columns([3, 1])
+        with col_p1:
+            st.markdown(f"**[{p['year']}] {p['title']}** ({p['format']})")
+        with col_p2:
+            st.markdown(f'<a href="{p["link"]}" target="_blank" class="download-link-btn">⬇️ Download PDF</a>', unsafe_allow_html=True)
+        st.markdown("---")
+
+
+# ------------------------------------------
+# TAB 5: INTERACTIVE MOCK TEST ENGINE
 # ------------------------------------------
 with tab_mocks:
-    st.subheader(f"⚡ Practice Mock Test - {selected_exam_name}")
+    st.subheader(f"⚡ Interactive Mock Exam ({selected_exam_name})")
+    st.write(f"Attempt **{num_mcqs} practice questions** dynamically configured below:")
     
-    # Fetch questions mapped to the current selected exam course
-    course_questions = exam_info.get("mocks", [])
-
-    if not course_questions:
-        st.warning("No mock questions available for this course yet.")
+    all_mocks = exam_info.get("mocks", [])
+    
+    if not all_mocks:
+        st.warning("No questions currently available in the database for this exam.")
     else:
-        # Dynamically fit questions based on sidebar slider (num_mcqs)
-        questions_to_show = course_questions[:num_mcqs] if num_mcqs <= len(course_questions) else course_questions
-
-        st.info(f"📋 **{len(questions_to_show)}** questions loaded for **{selected_exam_name}**. Select your answers below:")
-
-        # Form with interactive radio buttons for user selection
-        form_key = f"mock_form_{selected_exam_name}_{num_mcqs}"
-
-        with st.form(key=form_key):
-            user_selections = {}
-            
-            for idx, q in enumerate(questions_to_show):
-                st.markdown(f"#### **Q{idx+1}: {q['question']}**")
-                
-                # Interactive Radio Button Component
-                user_selections[idx] = st.radio(
-                    label=f"Choose option for Q{idx+1}",
+        # Limit or sample to requested number of MCQs
+        available_count = min(num_mcqs, len(all_mocks))
+        active_mocks = all_mocks[:available_count]
+        
+        with st.form(key="mock_test_form"):
+            user_answers = {}
+            for idx, q in enumerate(active_mocks, start=1):
+                st.markdown(f"**Q{idx}. {q['question']}**")
+                user_answers[idx] = st.radio(
+                    f"Select Answer for Q{idx}:",
                     options=q["options"],
-                    index=None,  # Leave unselected initially
-                    key=f"user_choice_{selected_exam_name}_{idx}"
+                    key=f"q_{idx}",
+                    label_visibility="collapsed"
                 )
                 st.markdown("---")
-                
-            submit_btn = st.form_submit_button("📩 Submit My Answers", use_container_width=True)
+            
+            submit_btn = st.form_submit_button("🏆 Submit & Evaluate Score", use_container_width=True)
 
-        # Evaluation & Results Display
         if submit_btn:
             score = 0
-            unanswered = 0
+            st.markdown("### 📊 Test Results & Detailed Solutions")
             
-            st.markdown(f"### 📊 Results Breakdown for {selected_exam_name}")
-            
-            for idx, q in enumerate(questions_to_show):
-                user_choice = user_selections[idx]
-                correct_ans = q["answer"]
+            for idx, q in enumerate(active_mocks, start=1):
+                user_choice = user_answers[idx]
+                correct_choice = q["answer"]
                 
-                if user_choice is None:
-                    unanswered += 1
-                    st.warning(f"**Q{idx+1}: Unanswered** | Correct Answer: **{correct_ans}**")
-                elif user_choice == correct_ans:
+                if user_choice == correct_choice:
                     score += 1
-                    st.success(f"**Q{idx+1}: Correct!** You selected **{user_choice}**")
+                    st.success(f"**Q{idx}: Correct!** (Your answer: {user_choice})")
                 else:
-                    st.error(f"**Q{idx+1}: Incorrect.** You selected **{user_choice}** | Correct Answer: **{correct_ans}**")
-                
+                    st.error(f"**Q{idx}: Incorrect!** (Your choice: {user_choice} | Correct Answer: {correct_choice})")
+                    
                 st.caption(f"💡 **Explanation:** {q['explanation']}")
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-            # Score Overview
-            total_qs = len(questions_to_show)
-            pct = (score / total_qs) * 100 if total_qs > 0 else 0
-            
-            col_s1, col_s2, col_s3 = st.columns(3)
-            col_s1.metric("Total Score", f"{score} / {total_qs}")
-            col_s2.metric("Accuracy", f"{pct:.1f}%")
-            col_s3.metric("Skipped", unanswered)
+                st.markdown("---")
 
-            if pct >= 80:
-                st.balloons()
+            percentage = (score / available_count) * 100
+            st.balloons()
+            st.metric("Final Mock Score", f"{score} / {available_count}", f"{percentage:.1f}% Score Rate")
+
 
 # ------------------------------------------
-# TAB 6: DOUBT CHATBOX & VOICE ASSISTANT
+# TAB 6: ASK DOUBTS AI
 # ------------------------------------------
 with tab_chat:
-    st.subheader("💬 Ask Doubts & AI Voice Assistant")
-    st.markdown("Clear your doubts instantly using text or voice inputs!")
+    st.subheader("💬 Ask Your Exam & Academic Doubts AI")
+    st.markdown("Type any doubt, formula clarification, or guidance question below.")
+    
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
-    # Initialize chat history
-    if "chat_messages" not in st.session_state:
-        st.session_state.chat_messages = [
-            {"role": "assistant", "content": f"Hello! I am your AI Tutor for **{selected_exam_name}**. Ask me any doubt or concept you want explained!"}
-        ]
-
-    # Render previous messages
-    for msg in st.session_state.chat_messages:
+    for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
-    st.markdown("---")
-    
-    # Audio input option
-    st.markdown("#### 🎙️ Voice Input (Record Your Doubt)")
-    audio_value = st.audio_input("Record audio doubt")
+    user_query = st.chat_input("Ask any doubt regarding syllabus, maths shortcut, or strategy...")
 
-    # Text input option
-    user_doubt = st.chat_input(f"Type your doubt regarding {selected_exam_name}...")
-
-    prompt_to_process = None
-
-    if audio_value:
-        prompt_to_process = f"[Voice Input Received] Can you explain the general key concepts for {selected_exam_name}?"
-    elif user_doubt:
-        prompt_to_process = user_doubt
-
-    if prompt_to_process:
-        # Append User Message
-        st.session_state.chat_messages.append({"role": "user", "content": prompt_to_process})
+    if user_query:
+        st.session_state.chat_history.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
-            st.write(prompt_to_process)
+            st.write(user_query)
 
-        # Generate AI Response
         with st.chat_message("assistant"):
-            with st.spinner("Analyzing doubt & preparing response..."):
-                if api_key:
-                    try:
-                        from groq import Groq
-                        client = Groq(api_key=api_key)
-                        response = client.chat.completions.create(
-                            model="llama-3.3-70b-versatile",
-                            messages=[
-                                {"role": "system", "content": f"You are an expert tutor helping a student prepare for {selected_exam_name}. Keep explanations concise, accurate, and easy to understand."},
-                                *[{"role": m["role"], "content": m["content"]} for m in st.session_state.chat_messages]
-                            ]
-                        )
-                        reply = response.choices[0].message.content
-                    except Exception as e:
-                        reply = f"Error generating answer: {str(e)}"
-                else:
-                    reply = f"Here is a quick guidance on your query regarding **{selected_exam_name}**:\n\nFocus on core syllabus topics, revise previous year questions, and ensure daily speed tests. *(Add a Groq API Key in the sidebar for full conversational AI answers!)*"
+            if api_key:
+                try:
+                    from groq import Groq
+                    client = Groq(api_key=api_key)
+                    sys_prompt = f"You are an expert tutor for the {selected_exam_name} exam. Provide concise, clear, and encouraging solutions."
+                    res = client.chat.completions.create(
+                        model="llama-3.3-70b-versatile",
+                        messages=[
+                            {"role": "system", "content": sys_prompt},
+                            {"role": "user", "content": user_query}
+                        ]
+                    )
+                    ans = res.choices[0].message.content
+                except Exception as e:
+                    ans = f"Error communicating with AI model: {str(e)}"
+            else:
+                ans = f"*(Demo Mode - Add a Groq API Key in the sidebar to activate live AI answers)*\n\nTo solve doubts regarding **{user_query}**, refer to standard previous year papers or video tutorials listed in the Curated Lectures tab!"
 
-                st.write(reply)
-                
-                # Audio response synthesis (Voice Output)
-                if HAS_GTTS:
-                    try:
-                        audio_fp = text_to_speech(reply[:250])  # Convert first 250 chars to speech
-                        if audio_fp:
-                            st.audio(audio_fp, format="audio/mp3")
-                    except Exception as audio_err:
-                        st.caption("🔊 Voice response generation skipped.")
-
-        st.session_state.chat_messages.append({"role": "assistant", "content": reply})
+            st.write(ans)
+            st.session_state.chat_history.append({"role": "assistant", "content": ans})
